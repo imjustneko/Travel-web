@@ -3,8 +3,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-function Home() {
+function Home({ searchParams }) {
   const [destinations, setDestinations] = useState([]);
+  const [filteredDestinations, setFilteredDestinations] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -12,13 +13,41 @@ function Home() {
     fetchDestinations();
   }, []);
 
+  useEffect(() => {
+    if (searchParams) {
+      performSearch(searchParams);
+    } else {
+      setFilteredDestinations(destinations);
+    }
+  }, [searchParams, destinations]);
+
   const fetchDestinations = async () => {
     try {
       const response = await axios.get('http://localhost:5000/api/destinations');
       setDestinations(response.data);
+      setFilteredDestinations(response.data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching destinations:', error);
+      setLoading(false);
+    }
+  };
+
+  const performSearch = async (params) => {
+    if (!params.query && params.category === 'all') {
+      setFilteredDestinations(destinations);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const queryString = new URLSearchParams(params).toString();
+      const response = await axios.get(`http://localhost:5000/api/search?${queryString}`);
+      setFilteredDestinations(response.data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error searching:', error);
+      setFilteredDestinations(destinations);
       setLoading(false);
     }
   };
@@ -35,8 +64,8 @@ function Home() {
     );
   }
 
-  const featuredDestinations = destinations.filter(d => d.featured);
-  const regularDestinations = destinations.filter(d => !d.featured);
+  const featuredDestinations = filteredDestinations.filter(d => d.featured);
+  const regularDestinations = filteredDestinations.filter(d => !d.featured);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
@@ -48,6 +77,30 @@ function Home() {
           Start Exploring
         </button>
       </div>
+
+      {/* Search Results Info */}
+      {searchParams && (searchParams.query || searchParams.category !== 'all') && (
+        <div className="mb-6 flex items-center justify-between bg-blue-50 p-4 rounded-lg">
+          <p className="text-gray-700">
+            {filteredDestinations.length > 0 ? (
+              <>
+                Found <span className="font-bold">{filteredDestinations.length}</span> destination(s)
+                {searchParams.query && (
+                  <> for "<span className="font-semibold">{searchParams.query}</span>"</>
+                )}
+              </>
+            ) : (
+              <>No destinations found. Try a different search.</>
+            )}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="text-blue-600 hover:text-blue-700 font-semibold"
+          >
+            Clear Search
+          </button>
+        </div>
+      )}
 
       {/* Featured Destinations */}
       {featuredDestinations.length > 0 && (
@@ -102,7 +155,9 @@ function Home() {
       {/* All Destinations */}
       {regularDestinations.length > 0 && (
         <section>
-          <h2 className="text-3xl font-bold mb-6">All Destinations</h2>
+          <h2 className="text-3xl font-bold mb-6">
+            {featuredDestinations.length > 0 ? 'More Destinations' : 'All Destinations'}
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {regularDestinations.map((destination) => (
               <div 
@@ -149,10 +204,14 @@ function Home() {
         </section>
       )}
 
-      {destinations.length === 0 && !loading && (
+      {filteredDestinations.length === 0 && !loading && (
         <div className="text-center py-12">
-          <p className="text-gray-500 text-xl">No destinations available yet.</p>
-          <p className="text-gray-400 mt-2">Admin can add destinations from the dashboard.</p>
+          <p className="text-gray-500 text-xl">No destinations available.</p>
+          {searchParams ? (
+            <p className="text-gray-400 mt-2">Try a different search term.</p>
+          ) : (
+            <p className="text-gray-400 mt-2">Admin can add destinations from the dashboard.</p>
+          )}
         </div>
       )}
     </div>

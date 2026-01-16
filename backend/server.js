@@ -9,6 +9,8 @@ const authRoutes = require('./routes/auth');
 const homeRoutes = require('./routes/home');
 const adminRoutes = require('./routes/admin');
 const destinationRoutes = require('./routes/destinations');
+const searchRoutes = require('./routes/search');
+const userRoutes = require('./routes/user');
 
 const app = express();
 
@@ -33,6 +35,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api', homeRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/destinations', destinationRoutes);
+app.use('/api/search', searchRoutes);
+app.use('/api/user', userRoutes);
 
 // Health check
 app.get('/', (req, res) => {
