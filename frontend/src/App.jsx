@@ -1,6 +1,6 @@
 // frontend/src/App.jsx
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import TopBar from './components/TopBar';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -10,6 +10,8 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
 import DestinationDetail from './pages/DestinationDetail';
+import EventsList from './pages/EventsList';
+import LoadingSpinner from './components/ui/LoadingSpinner';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -76,6 +78,7 @@ function App() {
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/register" element={<Register onLogin={handleLogin} />} />
           <Route path="/destination/:id" element={<DestinationDetail />} />
+          <Route path="/events" element={<EventsList />} />
           <Route 
             path="/profile" 
             element={

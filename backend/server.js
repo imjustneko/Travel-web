@@ -1,4 +1,3 @@
-// backend/server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -11,6 +10,10 @@ const adminRoutes = require('./routes/admin');
 const destinationRoutes = require('./routes/destinations');
 const searchRoutes = require('./routes/search');
 const userRoutes = require('./routes/user');
+const reservationRoutes = require('./routes/reservations');
+const reviewRoutes = require('./routes/reviews');
+const subscriptionRoutes = require('./routes/subscription');
+const eventsRoutes = require('./routes/events');
 
 const app = express();
 
@@ -37,10 +40,14 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/destinations', destinationRoutes);
 app.use('/api/search', searchRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/reservations', reservationRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/subscription', subscriptionRoutes);
+app.use('/api/events', eventsRoutes);
 
 // Health check
 app.get('/', (req, res) => {
-  res.json({ message: 'Travel App API v2 is running!' });
+  res.json({ message: 'Resort API v2 is running!' });
 });
 
 // Start server
@@ -48,3 +55,5 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
+
+// THAT'S IT! Only 2 lines added to existing server.js

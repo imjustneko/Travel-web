@@ -45,6 +45,13 @@ const destinationSchema = new mongoose.Schema({
     type: String,
     default: null
   },
+  // ⭐ ADD THIS NEW FIELD ⭐
+  category: {
+    type: String,
+    enum: ['room', 'dining', 'activity', 'event', 'offer'],
+    default: 'room'
+  },
+  // ⭐ END OF NEW FIELD ⭐
   createdAt: {
     type: Date,
     default: Date.now

@@ -1,54 +1,31 @@
-// frontend/src/components/Navbar.jsx
-import { Link, useNavigate } from 'react-router-dom';
+// frontend/src/components/Navbar.jsx - RESORT VERSION
+import { Link } from 'react-router-dom';
 
-function Navbar({ isAuthenticated, isAdmin, onLogout }) {
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    onLogout();
-    navigate('/');
-  };
-
+function Navbar({ isAuthenticated, isAdmin }) {
   return (
-    <nav className="bg-blue-600 text-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-14">
-          {/* Navigation Links */}
-          <div className="flex items-center space-x-6">
-            <Link 
-              to="/" 
-              className="hover:bg-blue-700 px-3 py-2 rounded-md transition text-sm font-medium"
-            >
-              🏠 Home
-            </Link>
-            <Link 
-              to="/" 
-              className="hover:bg-blue-700 px-3 py-2 rounded-md transition text-sm font-medium"
-            >
-              🗺️ Destinations
-            </Link>
-            {isAuthenticated && (
-              <Link 
-                to="/profile" 
-                className="hover:bg-blue-700 px-3 py-2 rounded-md transition text-sm font-medium"
-              >
-                👤 My Account
-              </Link>
-            )}
-            {isAdmin && (
-              <Link 
-                to="/admin" 
-                className="bg-yellow-500 hover:bg-yellow-600 px-3 py-2 rounded-md transition font-semibold text-sm"
-              >
-                ⚙️ Admin
-              </Link>
-            )}
+    <nav className="bg-amber-900 text-white shadow-md">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex justify-between items-center h-12">
+          {/* Quick Info */}
+          <div className="flex items-center space-x-6 text-xs">
+            <span className="hidden md:block">📞 +976 11 123 456</span>
+            <span className="hidden lg:block">✉️ info@redrockresort.mn</span>
+            <span className="hidden xl:block">📍 Terelj National Park, Mongolia</span>
           </div>
 
-          {/* Right Side Info */}
-          <div className="flex items-center space-x-4 text-sm">
-            <span className="hidden md:block">📞 +1 (234) 567-890</span>
-            <span className="hidden lg:block">✉️ info@travelhub.com</span>
+          {/* Quick Links */}
+          <div className="flex items-center space-x-4 text-xs">
+            <a href="#rooms" className="hover:text-amber-200 transition">Book Now</a>
+            <span className="text-amber-600">•</span>
+            <a href="#offers" className="hover:text-amber-200 transition">Special Offers</a>
+            {isAdmin && (
+              <>
+                <span className="text-amber-600">•</span>
+                <Link to="/admin" className="bg-amber-700 hover:bg-amber-600 px-3 py-1 rounded transition font-semibold">
+                  Admin
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

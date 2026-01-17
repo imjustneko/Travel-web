@@ -1,4 +1,4 @@
-// backend/routes/search.js
+
 const express = require('express');
 const Destination = require('../models/Destination');
 
@@ -11,8 +11,14 @@ router.get('/', async (req, res) => {
 
     let filter = {};
 
-    // Text search across title, description, and location
-    if (query) {
+    // Category filtering
+    if (category && category !== 'all') {
+      filter.category = category;
+    }
+
+    // Text search with partial matching
+    // FIXED: Allow empty query - just return all items of that category
+    if (query && query.trim() !== '') {
       filter.$or = [
         { title: { $regex: query, $options: 'i' } },
         { description: { $regex: query, $options: 'i' } },
@@ -20,14 +26,14 @@ router.get('/', async (req, res) => {
       ];
     }
 
-    // Filter by category (if you add category field to destinations)
-    if (category && category !== 'all') {
-      filter.category = category;
-    }
+    // IMPORTANT: If no query but category is selected, return all of that category
+    // If no query and no category (or 'all'), return everything
 
     const destinations = await Destination.find(filter).sort({ createdAt: -1 });
+    
     res.json(destinations);
   } catch (error) {
+    console.error('Search error:', error);
     res.status(500).json({ message: 'Search failed', error: error.message });
   }
 });
