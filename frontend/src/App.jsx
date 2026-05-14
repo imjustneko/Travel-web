@@ -20,13 +20,39 @@ function App() {
   const [searchParams, setSearchParams] = useState(null);
 
   useEffect(() => {
-    // Check if user is logged in
     const token = localStorage.getItem('token');
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    
-    setIsAuthenticated(!!token);
-    setIsAdmin(user.isAdmin || false);
-    setUserName(user.name || '');
+    const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+
+    if (!token) {
+      setIsAuthenticated(false);
+      setIsAdmin(false);
+      setUserName('');
+      return;
+    }
+
+    setIsAuthenticated(true);
+    setIsAdmin(storedUser.isAdmin || false);
+    setUserName(storedUser.name || '');
+
+    const fetchProfile = async () => {
+      try {
+        const response = await api.get('/api/auth/profile', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        const serverUser = response.data;
+        localStorage.setItem('user', JSON.stringify(serverUser));
+        setIsAdmin(serverUser.isAdmin || false);
+        setUserName(serverUser.name || '');
+      } catch (error) {
+        console.error('Failed to refresh user profile:', error);
+        if (error.response?.status === 401) {
+          handleLogout();
+        }
+      }
+    };
+
+    fetchProfile();
   }, []);
 
   const handleLogin = (userData) => {
