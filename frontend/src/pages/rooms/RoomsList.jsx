@@ -5,7 +5,7 @@ import ErrorMessage from '../../components/ui/ErrorMessage';
 import LoadingSpinner from '../../components/ui/LoadingSpinner';
 
 function RoomsList() {
-  const { data, loading, error, refetch } = useFetch('http://localhost:5000/api/rooms');
+  const { data, loading, error, refetch } = useFetch('/api/rooms');
 
   if (loading) {
     return (

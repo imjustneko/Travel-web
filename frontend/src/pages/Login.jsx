@@ -1,7 +1,7 @@
 // frontend/src/pages/Login.jsx
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 
 function Login({ onLogin }) {
   const [formData, setFormData] = useState({
@@ -25,7 +25,7 @@ function Login({ onLogin }) {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', formData);
+      const response = await api.post('/api/auth/login', formData);
       
       // Save token and user data
       localStorage.setItem('token', response.data.token);

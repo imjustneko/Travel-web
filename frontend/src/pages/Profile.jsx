@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 
 function Profile({ userName, setUserName }) {
   const [profile, setProfile] = useState(null);
@@ -29,7 +29,7 @@ function Profile({ userName, setUserName }) {
   const fetchProfile = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/user/profile', {
+      const response = await api.get('/api/user/profile', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setProfile(response.data);
@@ -43,7 +43,7 @@ function Profile({ userName, setUserName }) {
   const fetchSubscription = async () => {
   try {
     const token = localStorage.getItem('token');
-    const response = await axios.get('http://localhost:5000/api/subscription/status', {
+    const response = await api.get('/api/subscription/status', {
       headers: { Authorization: `Bearer ${token}` }
     });
     setSubscription(response.data);
@@ -57,8 +57,8 @@ function Profile({ userName, setUserName }) {
 const handleUpgrade = async () => {
   try {
     const token = localStorage.getItem('token');
-    await axios.put(
-      'http://localhost:5000/api/subscription/upgrade',
+    await api.put(
+      '/api/subscription/upgrade',
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -78,8 +78,8 @@ const handleDowngrade = async () => {
 
   try {
     const token = localStorage.getItem('token');
-    await axios.put(
-      'http://localhost:5000/api/subscription/downgrade',
+    await api.put(
+      '/api/subscription/downgrade',
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -95,7 +95,7 @@ const handleDowngrade = async () => {
   const fetchReservations = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5000/api/reservations/my', {
+      const response = await api.get('/api/reservations/my', {
         headers: { Authorization: `Bearer ${token}` }
       });
       setReservations(response.data.reservations || []);
@@ -111,8 +111,8 @@ const handleDowngrade = async () => {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.put(
-        `http://localhost:5000/api/reservations/${reservationId}/cancel`,
+      await api.put(
+        `/api/reservations/${reservationId}/cancel`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -156,8 +156,8 @@ const handleDowngrade = async () => {
         updateData.newPassword = formData.newPassword;
       }
 
-      const response = await axios.put(
-        'http://localhost:5000/api/user/profile',
+      const response = await api.put(
+        '/api/user/profile',
         updateData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -495,7 +495,7 @@ const handleDowngrade = async () => {
                     <img
                       src={
                         reservation.itemDetails?.image
-                          ? `http://localhost:5000${reservation.itemDetails.image}`
+                          ? `${BASE_URL}${reservation.itemDetails.image}`
                           : 'https://via.placeholder.com/200x150?text=Room'
                       }
                       alt={reservation.itemDetails?.title || 'Room'}

@@ -1,6 +1,6 @@
 // frontend/src/pages/AdminDashboard.jsx
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 function AdminDashboard() {
   const [destinations, setDestinations] = useState([]);
@@ -30,8 +30,8 @@ function AdminDashboard() {
   const fetchDestinations = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(
-        'http://localhost:5000/api/admin/destinations',
+      const response = await api.get(
+        '/api/admin/destinations',
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setDestinations(response.data);
@@ -64,8 +64,8 @@ function AdminDashboard() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.post(
-        'http://localhost:5000/api/admin/upload',
+      const response = await api.post(
+        '/api/admin/upload',
         formDataImages,
         {
           headers: {
@@ -96,15 +96,15 @@ function AdminDashboard() {
       };
 
       if (editingId) {
-        await axios.put(
-          `http://localhost:5000/api/admin/destinations/${editingId}`,
+        await api.put(
+          `/api/admin/destinations/${editingId}`,
           destinationData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         alert('Destination updated successfully!');
       } else {
-        await axios.post(
-          'http://localhost:5000/api/admin/destinations',
+        await api.post(
+          '/api/admin/destinations',
           destinationData,
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -141,8 +141,8 @@ function AdminDashboard() {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(
-        `http://localhost:5000/api/admin/destinations/${id}`,
+      await api.delete(
+        `/api/admin/destinations/${id}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       fetchDestinations();

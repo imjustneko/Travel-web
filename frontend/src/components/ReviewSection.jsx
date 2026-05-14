@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../api';
 
 function ReviewSection({ itemId, itemType }) {
   const [reviews, setReviews] = useState([]);
@@ -28,9 +28,7 @@ function ReviewSection({ itemId, itemType }) {
 
   const fetchReviews = async () => {
     try {
-      const url = `http://localhost:5000/api/reviews/item/${itemId}`;
-      console.log('Fetching reviews from:', url);
-      const response = await axios.get(url);
+      const response = await api.get(`/api/reviews/item/${itemId}`);
       console.log('Reviews response:', response.data);
       setReviews(response.data.reviews);
       setAverageRating(response.data.averageRating);
@@ -61,8 +59,8 @@ function ReviewSection({ itemId, itemType }) {
     setError('');
 
     try {
-      await axios.post(
-        'http://localhost:5000/api/reviews',
+      await api.post(
+        '/api/reviews',
         {
           itemId,
           itemType,
@@ -114,8 +112,8 @@ function ReviewSection({ itemId, itemType }) {
 
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(
-        `http://localhost:5000/api/reviews/${reviewId}`,
+      await api.delete(
+        `/api/reviews/${reviewId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       

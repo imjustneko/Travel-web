@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api, { BASE_URL } from '../api';
 import ReviewSection from '../components/ReviewSection'; // ⭐ ADDED
 
 function DestinationDetail() {
@@ -32,7 +32,7 @@ function DestinationDetail() {
 
   const fetchItem = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/destinations/${id}`);
+      const response = await api.get(`/api/destinations/${id}`);
       setItem(response.data);
       setLoading(false);
     } catch (error) {
@@ -53,8 +53,8 @@ function DestinationDetail() {
     setBookingMessage('');
 
     try {
-      const response = await axios.post(
-        'http://localhost:5000/api/reservations',
+      const response = await api.post(
+        '/api/reservations',
         { itemId: item._id, guests: 1 },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -150,7 +150,7 @@ function DestinationDetail() {
 
   const hasImages = item.images && item.images.length > 0;
   const currentImage = hasImages 
-    ? `http://localhost:5000${item.images[currentImageIndex]}`
+    ? `${BASE_URL}${item.images[currentImageIndex]}`
     : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';
 
   return (

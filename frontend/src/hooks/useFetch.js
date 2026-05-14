@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api';
 
 export const useFetch = (url, dependencies = []) => {
   const [data, setData] = useState(null);
@@ -11,7 +11,7 @@ export const useFetch = (url, dependencies = []) => {
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.get(url);
+        const response = await api.get(url);
         setData(response.data);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch data');
@@ -29,7 +29,7 @@ export const useFetch = (url, dependencies = []) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await axios.get(url);
+      const response = await api.get(url);
       setData(response.data);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to fetch data');

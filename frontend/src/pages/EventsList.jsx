@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api, { BASE_URL } from '../api';
 
 function EventsList() {
   const [events, setEvents] = useState([]);
@@ -16,7 +16,7 @@ function EventsList() {
   const fetchEvents = async () => {
     try {
       console.log('Fetching events from /api/events');
-      const response = await axios.get('http://localhost:5000/api/events');
+      const response = await api.get('/api/events');
       console.log('Events response:', response.data);
       setEvents(response.data);
       setLoading(false);
@@ -85,7 +85,7 @@ function EventsList() {
                     <img
                       src={
                         event.images && event.images[0]
-                          ? `http://localhost:5000${event.images[0]}`
+                          ? `${BASE_URL}${event.images[0]}`
                           : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600'
                       }
                       alt={event.title}
