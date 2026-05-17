@@ -36,7 +36,7 @@ function Profile({ userName, setUserName }) {
       setFormData({ ...formData, name: response.data.name });
       setLoading(false);
     } catch (error) {
-      setError('Failed to load profile');
+      setError('Профайл ачааллахад алдаа гарлаа');
       setLoading(false);
     }
   };
@@ -64,15 +64,15 @@ const handleUpgrade = async () => {
     );
     fetchSubscription();
     fetchProfile();
-    setSuccess('🎉 Upgraded to Premium successfully!');
+    setSuccess('🎉 Пүрэмиум болгох амжилттай боллоо!');
     setTimeout(() => setSuccess(''), 3000);
   } catch (error) {
-    setError(error.response?.data?.message || 'Failed to upgrade');
+    setError(error.response?.data?.message || 'Дэвшүүлэхэд алдаа гарлаа');
   }
 };
 
 const handleDowngrade = async () => {
-  if (!window.confirm('Are you sure you want to cancel your premium membership?')) {
+  if (!window.confirm('Та пүрэмиум гишүүнчлэлээ цуцлахдаа итгэлтэй байна уу?')) {
     return;
   }
 
@@ -85,10 +85,10 @@ const handleDowngrade = async () => {
     );
     fetchSubscription();
     fetchProfile();
-    setSuccess('Downgraded to Guest account');
+    setSuccess('Зочны данс руу буулгагдлаа');
     setTimeout(() => setSuccess(''), 3000);
   } catch (error) {
-    setError(error.response?.data?.message || 'Failed to downgrade');
+    setError(error.response?.data?.message || 'Буулгахад алдаа гарлаа');
   }
 };
 
@@ -105,7 +105,7 @@ const handleDowngrade = async () => {
   };
 
   const handleCancelReservation = async (reservationId) => {
-    if (!window.confirm('Are you sure you want to cancel this reservation?')) {
+    if (!window.confirm('Та энэ захиалгыг цуцлахдаа итгэлтэй байна уу?')) {
       return;
     }
 
@@ -119,10 +119,10 @@ const handleDowngrade = async () => {
       
       // Refresh reservations
       fetchReservations();
-      setSuccess('Reservation cancelled successfully');
+      setSuccess('Захиалга амжилттай цуцлагдлаа');
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
-      setError('Failed to cancel reservation');
+      setError('Захиалгыг цуцлахад алдаа гарлаа');
     }
   };
 
@@ -143,7 +143,7 @@ const handleDowngrade = async () => {
     setSuccess('');
 
     if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
-      setError('New passwords do not match');
+      setError('Шинэ нууц үгнүүд таарахгүй байна');
       return;
     }
 
@@ -175,11 +175,11 @@ const handleDowngrade = async () => {
         confirmPassword: ''
       });
 
-      setSuccess('Profile updated successfully!');
+      setSuccess('Профайл амжилттай шинэчлэгдлаа!');
       setEditing(false);
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
-      setError(error.response?.data?.message || 'Failed to update profile');
+      setError(error.response?.data?.message || 'Профайл шинэчлэхэд алдаа гарлаа');
     }
   };
 
@@ -206,7 +206,7 @@ const handleDowngrade = async () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="text-2xl text-amber-800">Loading...</div>
+        <div className="text-2xl text-amber-800">Уншиж байна...</div>
       </div>
     );
   }
@@ -247,7 +247,7 @@ const handleDowngrade = async () => {
                 onClick={() => setEditing(true)}
                 className="bg-amber-800 text-white px-6 py-2 rounded-lg hover:bg-amber-900 transition"
               >
-                ✏️ Edit Profile
+                ✏️ Профайл засах
               </button>
             )}
           </div>
@@ -260,33 +260,32 @@ const handleDowngrade = async () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                 <div className="bg-amber-50 rounded-lg p-4">
                   <div className="text-3xl font-bold text-amber-800">{reservations.filter(r => r.status === 'confirmed').length}</div>
-                  <div className="text-gray-600">Active Reservations</div>
+                  <div className="text-gray-600">Идэвхтэй захиалгууд</div>
                 </div>
                 <div className="bg-green-50 rounded-lg p-4">
                   <div className="text-3xl font-bold text-green-600">{reservations.length}</div>
-                  <div className="text-gray-600">Total Bookings</div>
+                  <div className="text-gray-600">Нийт захиалгууд</div>
                 </div>
                 <div className="bg-purple-50 rounded-lg p-4">
                   <div className="text-3xl font-bold text-purple-600">
-                    {subscription?.accountType === 'premium' ? '⭐ Premium' : '👤 Guest'}
+                    {subscription?.accountType === 'premium' ? '⭐ Пүрэмиум' : '👤 Зочин'}
                   </div>
-                  <div className="text-gray-600">Account Type</div>
+                  <div className="text-gray-600">Дансны төрөл</div>
                 </div>
               </div>
 
               {/* Subscription Card */}
               {subscriptionLoading ? (
                 <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg border border-amber-300 p-6 mb-8">
-                  <p className="text-amber-700">Loading subscription status...</p>
+                  <p className="text-amber-700">Гишүүнчлэлийн статусыг ачааллаж байна...</p>
                 </div>
               ) : subscription ? (
                 <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg border border-amber-300 p-6 mb-8">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 className="text-2xl font-bold text-amber-900 mb-1">Membership Status</h3>
+                      <h3 className="text-2xl font-bold text-amber-900 mb-1">Гишүүнчлэлийн статус</h3>
                       <p className="text-amber-700">
-
-                        {subscription.accountType === 'premium' ? '⭐ Premium Member' : '👤 Guest Account'}
+                        {subscription.accountType === 'premium' ? '⭐ Пүрэмиум гишүүн' : '👤 Зочны данс'}
                       </p>
                     </div>
                     <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
@@ -294,35 +293,35 @@ const handleDowngrade = async () => {
                         ? 'bg-amber-800 text-white' 
                         : 'bg-gray-400 text-white'
                     }`}>
-                      {subscription.accountType === 'premium' ? 'ACTIVE' : 'GUEST'}
+                      {subscription.accountType === 'premium' ? 'ИДЭВХТЭЙ' : 'ЗОЧИН'}
                     </span>
                   </div>
 
                   {subscription.accountType === 'premium' && (
                     <div className="mb-4 text-sm text-amber-700">
-                      <strong>Renewal Date:</strong> {new Date(subscription.subscriptionExpiry).toLocaleDateString()}
+                      <strong>Сунгалтын огноо:</strong> {new Date(subscription.subscriptionExpiry).toLocaleDateString()}
                     </div>
                   )}
 
                   {/* Benefits List */}
                   <div className="mb-6">
-                    <h4 className="font-semibold text-amber-900 mb-3">Your Benefits:</h4>
+                    <h4 className="font-semibold text-amber-900 mb-3">Таны давуу тал:</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       <div className="flex items-center text-amber-800">
                         <span className="text-green-600 mr-2">✓</span>
-                        {subscription.accountType === 'premium' ? 'Early Booking Access' : 'Standard Booking'}
+                        {subscription.accountType === 'premium' ? 'Эрт захиалах эрх' : 'Стандарт захиалга'}
                       </div>
                       <div className="flex items-center text-amber-800">
                         <span className="text-green-600 mr-2">✓</span>
-                        {subscription.accountType === 'premium' ? '20% Discount on All Bookings' : 'Standard Pricing'}
+                        {subscription.accountType === 'premium' ? 'Бүх захиалгад 20% хямдрал' : 'Стандарт үнэ'}
                       </div>
                       <div className="flex items-center text-amber-800">
                         <span className="text-green-600 mr-2">✓</span>
-                        {subscription.accountType === 'premium' ? 'Free Room Upgrades' : 'No Upgrades'}
+                        {subscription.accountType === 'premium' ? 'Үнэгүй өрөө дэвшүүлэх' : 'Дэвшүүлэх боломжгүй'}
                       </div>
                       <div className="flex items-center text-amber-800">
                         <span className="text-green-600 mr-2">✓</span>
-                        {subscription.accountType === 'premium' ? '24/7 Priority Support' : 'Standard Support'}
+                        {subscription.accountType === 'premium' ? '24/7 Тэргүүн тусламж' : 'Стандарт тусламж'}
                       </div>
                     </div>
                   </div>
@@ -334,43 +333,43 @@ const handleDowngrade = async () => {
                         onClick={handleUpgrade}
                         className="bg-amber-800 text-white px-6 py-2 rounded-lg hover:bg-amber-900 transition font-semibold"
                       >
-                        🚀 Upgrade to Premium
+                        🚀 Пүрэмиум болгох
                       </button>
                     ) : (
                       <button
                         onClick={handleDowngrade}
                         className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition font-semibold"
                       >
-                        📉 Downgrade to Guest
+                        📉 Зочин рүү буулгах
                       </button>
                     )}
                   </div>
                 </div>
               ) : (
                 <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg border border-amber-300 p-6 mb-8">
-                  <p className="text-amber-700">Unable to load subscription status</p>
+                  <p className="text-amber-700">Гишүүнчлэлийн статусыг ачааллах боломжгүй</p>
                 </div>
               )}
 
               <div className="border-t pt-6">
-                <h2 className="text-xl font-semibold mb-4">Account Details</h2>
+                <h2 className="text-xl font-semibold mb-4">Дансны дэлгэрэнгүй</h2>
                 <div className="space-y-4">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Member Since:</span>
+                    <span className="text-gray-600">Гишүүн болсон огноо:</span>
                     <span className="font-semibold">
                       {new Date(profile?.memberSince).toLocaleDateString()}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Account Status:</span>
-                    <span className="font-semibold text-green-600">Active</span>
+                    <span className="text-gray-600">Дансны статус:</span>
+                    <span className="font-semibold text-green-600">Идэвхтэй</span>
                   </div>
                 </div>
               </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
-              <h2 className="text-2xl font-bold mb-6">Edit Profile</h2>
+              <h2 className="text-2xl font-bold mb-6">Профайл засах</h2>
 
               {error && (
                 <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -379,7 +378,7 @@ const handleDowngrade = async () => {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Бүтэн нэр</label>
                 <input
                   type="text"
                   name="name"
@@ -391,53 +390,53 @@ const handleDowngrade = async () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">И-мэйл хаяг</label>
                 <input
                   type="email"
                   value={profile?.email}
                   disabled
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
                 />
-                <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+                <p className="text-xs text-gray-500 mt-1">И-мэйл хаягийг өөрчлөх боломжгүй</p>
               </div>
 
               <div className="border-t pt-6">
-                <h3 className="text-lg font-semibold mb-4">Change Password (Optional)</h3>
-                
+                <h3 className="text-lg font-semibold mb-4">Нууц үг солих (Заавал биш)</h3>
+
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Одоогийн нууц үг</label>
                     <input
                       type="password"
                       name="currentPassword"
                       value={formData.currentPassword}
                       onChange={handleInputChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                      placeholder="Enter current password"
+                      placeholder="Одоогийн нууц үгийг оруулна уу"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Шинэ нууц үг</label>
                     <input
                       type="password"
                       name="newPassword"
                       value={formData.newPassword}
                       onChange={handleInputChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                      placeholder="Enter new password (min 6 characters)"
+                      placeholder="Шинэ нууц үгийг оруулна уу (доод тал нь 6 тэмдэгт)"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Шинэ нууц үгийг баталгаажуулах</label>
                     <input
                       type="password"
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleInputChange}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                      placeholder="Confirm new password"
+                      placeholder="Шинэ нууц үгийг дахин оруулна уу"
                     />
                   </div>
                 </div>
@@ -448,14 +447,14 @@ const handleDowngrade = async () => {
                   type="submit"
                   className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition font-semibold"
                 >
-                  💾 Save Changes
+                  💾 Өөрчлөлт хадгалах
                 </button>
                 <button
                   type="button"
                   onClick={cancelEdit}
                   className="bg-gray-400 text-white px-6 py-2 rounded-lg hover:bg-gray-500 transition font-semibold"
                 >
-                  ✖️ Cancel
+                  ✖️ Цуцлах
                 </button>
               </div>
             </form>
@@ -468,18 +467,18 @@ const handleDowngrade = async () => {
 
       {/* Reservations Section */}
       <div className="bg-white rounded-lg shadow-lg p-6 mt-8">
-        <h2 className="text-2xl font-bold mb-6">My Reservations</h2>
-        
+        <h2 className="text-2xl font-bold mb-6">Миний захиалгууд</h2>
+
         {reservations.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             <div className="text-6xl mb-4">🏨</div>
-            <p className="text-xl mb-2">No reservations yet</p>
-            <p className="text-sm mb-6">Start planning your perfect stay</p>
+            <p className="text-xl mb-2">Захиалга байхгүй байна</p>
+            <p className="text-sm mb-6">Төгс хонолтоо төлөвлөж эхлэх</p>
             <button
               onClick={() => navigate('/')}
               className="bg-amber-800 text-white px-6 py-3 rounded-lg hover:bg-amber-900 transition font-semibold"
             >
-              Explore Our Resort
+              Манай ресортыг судлах
             </button>
           </div>
         ) : (
@@ -515,11 +514,11 @@ const handleDowngrade = async () => {
                     </div>
 
                     <p className="text-gray-600 text-sm mb-2">
-                      {reservation.itemDetails?.price || 'N/A'} per night
+                      {reservation.itemDetails?.price || 'Тодорхойгүй'} шөнөд
                     </p>
 
                     <p className="text-gray-500 text-xs mb-4">
-                      Booked on {new Date(reservation.createdAt).toLocaleDateString()}
+                      Захиалсан огноо: {new Date(reservation.createdAt).toLocaleDateString()}
                     </p>
 
                     <div className="flex gap-2">
@@ -528,7 +527,7 @@ const handleDowngrade = async () => {
                           onClick={() => handleViewRoom(reservation.item._id)}
                           className="flex-1 bg-amber-800 text-white px-3 py-2 rounded text-sm hover:bg-amber-900 transition"
                         >
-                          View Room
+                          Өрөө үзэх
                         </button>
                       )}
                       {reservation.status !== 'cancelled' && (
@@ -536,7 +535,7 @@ const handleDowngrade = async () => {
                           onClick={() => handleCancelReservation(reservation._id)}
                           className="flex-1 bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700 transition"
                         >
-                          Cancel
+                          Цуцлах
                         </button>
                       )}
                     </div>

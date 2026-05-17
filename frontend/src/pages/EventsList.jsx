@@ -36,7 +36,7 @@ function EventsList() {
       <div className="flex justify-center items-center h-screen bg-gray-50">
         <div className="text-center">
           <div className="text-4xl mb-4">🎉</div>
-          <div className="text-2xl text-amber-800">Loading events...</div>
+          <div className="text-2xl text-amber-800">Арга хэмжээнүүдийг уншиж байна...</div>
         </div>
       </div>
     );
@@ -47,8 +47,8 @@ function EventsList() {
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-amber-800 to-amber-900 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-4">Resort Events</h1>
-          <p className="text-xl opacity-90">Experience unforgettable moments at Red Rock Resort</p>
+          <h1 className="text-5xl font-bold mb-4">Ресортын арга хэмжээ</h1>
+          <p className="text-xl opacity-90">Улаан Хад Ресортод мартагдашгүй мөчүүдийг мэдэрнэ үү</p>
         </div>
       </div>
 
@@ -57,20 +57,20 @@ function EventsList() {
         {events.length === 0 ? (
           <div className="text-center py-20">
             <div className="text-6xl mb-4">📅</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">No Events Scheduled</h2>
-            <p className="text-gray-600 mb-6">Check back soon for upcoming events and special occasions</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Товлосон арга хэмжээ байхгүй</h2>
+            <p className="text-gray-600 mb-6">Удахгүй болох арга хэмжээ болон тусгай тохиолдлуудыг дараа шалгана уу</p>
             <button
               onClick={() => navigate('/')}
               className="px-6 py-3 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition font-semibold"
             >
-              Return to Home
+              Нүүр хуудас руу буцах
             </button>
           </div>
         ) : (
           <>
             <div className="mb-8">
-              <h2 className="text-3xl font-bold text-gray-900">Upcoming Events</h2>
-              <p className="text-gray-600 mt-2">Join us for exclusive resort events and celebrations</p>
+              <h2 className="text-3xl font-bold text-gray-900">Удахгүй болох арга хэмжээ</h2>
+              <p className="text-gray-600 mt-2">Ресортын онцгой арга хэмжээ болон баяр ёслолд бидэнтэй нэгдэнэ үү</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -93,7 +93,7 @@ function EventsList() {
                     />
                     {event.featured && (
                       <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full font-bold text-sm">
-                        Featured
+                        Онцлох
                       </div>
                     )}
                     {event.discount && (
@@ -139,7 +139,7 @@ function EventsList() {
                     </div>
 
                     <button className="w-full py-3 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition font-semibold">
-                      Register Now
+                      Бүртгүүлэх
                     </button>
                   </div>
                 </div>
@@ -152,18 +152,18 @@ function EventsList() {
       {/* Call to Action */}
       <div className="bg-gray-900 text-white py-16 mt-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Don't Miss Out</h2>
+          <h2 className="text-3xl font-bold mb-4">Бүү алда</h2>
           <p className="text-xl mb-8 opacity-90">
-            Subscribe to our newsletter to stay updated on upcoming events and special offers
+            Удахгүй болох арга хэмжээ болон тусгай саналуудын талаар мэдэгдэл авахын тулд бидний мэдээллийн захидалд бүртгүүлнэ үү
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
             <input
               type="email"
-              placeholder="Your email"
+              placeholder="Таны и-мэйл"
               className="flex-1 px-4 py-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500"
             />
             <button className="px-8 py-3 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition font-semibold whitespace-nowrap">
-              Subscribe
+              Бүртгүүлэх
             </button>
           </div>
         </div>

@@ -27,13 +27,13 @@ function Register({ onLogin }) {
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError('Нууц үгнүүд таарахгүй байна');
       return;
     }
 
     // Validate password length
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError('Нууц үг дор хаяж 6 тэмдэгт байх ёстой');
       return;
     }
 
@@ -56,7 +56,7 @@ function Register({ onLogin }) {
       // Redirect to home
       navigate('/');
     } catch (error) {
-      setError(error.response?.data?.message || 'Registration failed. Please try again.');
+      setError(error.response?.data?.message || 'Бүртгэлд алдаа гарлаа. Дахин оролдоно уу.');
     } finally {
       setLoading(false);
     }
@@ -67,12 +67,12 @@ function Register({ onLogin }) {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="text-center text-3xl font-extrabold text-gray-900">
-            Create your account
+            Данс үүсгэх
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
+            Эсвэл{' '}
             <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-              sign in to existing account
+              одоо байгаа дансаар нэвтрэх
             </Link>
           </p>
         </div>
@@ -87,7 +87,7 @@ function Register({ onLogin }) {
           <div className="space-y-4">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Full Name
+                Бүтэн нэр
               </label>
               <input
                 id="name"
@@ -97,13 +97,13 @@ function Register({ onLogin }) {
                 value={formData.name}
                 onChange={handleChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="John Doe"
+                placeholder="Батболд Дорж"
               />
             </div>
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
+                И-мэйл хаяг
               </label>
               <input
                 id="email"
@@ -119,7 +119,7 @@ function Register({ onLogin }) {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
+                Нууц үг
               </label>
               <input
                 id="password"
@@ -135,7 +135,7 @@ function Register({ onLogin }) {
 
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm Password
+                Нууц үг баталгаажуулах
               </label>
               <input
                 id="confirmPassword"
@@ -155,7 +155,7 @@ function Register({ onLogin }) {
             disabled={loading}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            {loading ? 'Creating account...' : 'Create account'}
+            {loading ? 'Данс үүсгэж байна...' : 'Данс үүсгэх'}
           </button>
         </form>
       </div>

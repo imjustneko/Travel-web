@@ -51,7 +51,7 @@ function ReviewSection({ itemId, itemType }) {
     }
 
     if (formData.comment.length < 10) {
-      setError('Comment must be at least 10 characters');
+      setError('Сэтгэгдэл дор хаяж 10 тэмдэгт байх ёстой');
       return;
     }
 
@@ -72,14 +72,14 @@ function ReviewSection({ itemId, itemType }) {
         }
       );
 
-      setSuccess('Review submitted successfully!');
+      setSuccess('Сэтгэгдэл амжилттай илгээгдлаа!');
       setFormData({ rating: 5, comment: '' });
       setShowForm(false);
       fetchReviews();
-      
+
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
-      setError(error.response?.data?.message || 'Failed to submit review');
+      setError(error.response?.data?.message || 'Сэтгэгдэл илгээхэд алдаа гарлаа');
     } finally {
       setSubmitting(false);
     }
@@ -106,7 +106,7 @@ function ReviewSection({ itemId, itemType }) {
   };
 
   const handleDeleteReview = async (reviewId) => {
-    if (!window.confirm('Are you sure you want to delete this review?')) {
+    if (!window.confirm('Та энэ сэтгэгдлийг устгахдаа итгэлтэй байна уу?')) {
       return;
     }
 
@@ -118,10 +118,10 @@ function ReviewSection({ itemId, itemType }) {
       );
       
       fetchReviews();
-      setSuccess('Review deleted successfully');
+      setSuccess('Сэтгэгдэл амжилттай устгагдлаа');
       setTimeout(() => setSuccess(''), 3000);
     } catch (error) {
-      setError('Failed to delete review');
+      setError('Сэтгэгдэл устгахад алдаа гарлаа');
     }
   };
 
@@ -133,7 +133,7 @@ function ReviewSection({ itemId, itemType }) {
   return (
     <div className="mt-12 border-t pt-8">
       <div className="mb-8 bg-amber-50 p-6 rounded-lg border border-amber-200">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">Guest Reviews & Ratings</h2>
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">Зочдын сэтгэгдэл ба үнэлгээ</h2>
         {totalReviews > 0 ? (
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
@@ -144,12 +144,12 @@ function ReviewSection({ itemId, itemType }) {
               <span className="text-lg text-gray-600">/5.0</span>
             </div>
             <div className="border-l border-gray-300 pl-6">
-              <p className="text-lg font-semibold text-gray-900">{totalReviews} {totalReviews === 1 ? 'review' : 'reviews'}</p>
-              <p className="text-sm text-gray-600">Based on customer experiences</p>
+              <p className="text-lg font-semibold text-gray-900">{totalReviews} сэтгэгдэл</p>
+              <p className="text-sm text-gray-600">Зочдын туршлагад үндэслэсэн</p>
             </div>
           </div>
         ) : (
-          <p className="text-gray-600 text-lg">No ratings yet. Be the first to share your experience!</p>
+          <p className="text-gray-600 text-lg">Үнэлгээ байхгүй байна. Туршлагаа хамгийн түрүүнд хуваалцаарай!</p>
         )}
       </div>
 
@@ -178,36 +178,36 @@ function ReviewSection({ itemId, itemType }) {
           }}
           className="mb-6 px-6 py-3 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition font-semibold"
         >
-          ✍️ Write a Review
+          ✍️ Сэтгэгдэл бичих
         </button>
       )}
 
       {/* Review Form */}
       {showForm && (
         <form onSubmit={handleSubmit} className="mb-8 bg-gray-50 p-6 rounded-lg">
-          <h3 className="text-xl font-semibold mb-4">Share Your Experience</h3>
-          
+          <h3 className="text-xl font-semibold mb-4">Туршлагаа хуваалцах</h3>
+
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Your Rating
+              Таны үнэлгээ
             </label>
             {renderStars(formData.rating, true, (star) => setFormData({ ...formData, rating: star }))}
           </div>
 
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Your Review
+              Таны сэтгэгдэл
             </label>
             <textarea
               value={formData.comment}
               onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-              placeholder="Tell others about your experience... (minimum 10 characters)"
+              placeholder="Туршлагаа бусадтай хуваалцаарай... (доод тал нь 10 тэмдэгт)"
               rows="5"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               required
             />
             <p className="text-sm text-gray-500 mt-1">
-              {formData.comment.length} / 1000 characters
+              {formData.comment.length} / 1000 тэмдэгт
             </p>
           </div>
 
@@ -217,7 +217,7 @@ function ReviewSection({ itemId, itemType }) {
               disabled={submitting}
               className="px-6 py-2 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition font-semibold disabled:opacity-50"
             >
-              {submitting ? 'Submitting...' : 'Submit Review'}
+              {submitting ? 'Илгээж байна...' : 'Сэтгэгдэл илгээх'}
             </button>
             <button
               type="button"
@@ -228,7 +228,7 @@ function ReviewSection({ itemId, itemType }) {
               }}
               className="px-6 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition font-semibold"
             >
-              Cancel
+              Цуцлах
             </button>
           </div>
         </form>
@@ -237,13 +237,13 @@ function ReviewSection({ itemId, itemType }) {
       {/* Reviews List */}
       {loading ? (
         <div className="text-center py-8">
-          <div className="text-gray-600">Loading reviews...</div>
+          <div className="text-gray-600">Сэтгэгдлүүдийг уншиж байна...</div>
         </div>
       ) : reviews.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-lg">
           <div className="text-6xl mb-4">💬</div>
-          <p className="text-xl text-gray-600 mb-2">No reviews yet</p>
-          <p className="text-gray-500">Be the first to share your experience!</p>
+          <p className="text-xl text-gray-600 mb-2">Сэтгэгдэл байхгүй байна</p>
+          <p className="text-gray-500">Туршлагаа хамгийн түрүүнд хуваалцаарай!</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -269,7 +269,7 @@ function ReviewSection({ itemId, itemType }) {
                       onClick={() => handleDeleteReview(review._id)}
                       className="text-red-600 hover:text-red-700 text-sm"
                     >
-                      Delete
+                      Устгах
                     </button>
                   )}
                 </div>

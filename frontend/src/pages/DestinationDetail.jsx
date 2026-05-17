@@ -37,7 +37,7 @@ function DestinationDetail() {
       setLoading(false);
     } catch (error) {
       console.error('Error fetching item:', error);
-      setError('Failed to load details. Please try again.');
+      setError('Дэлгэрэнгүй мэдээлэл ачааллахад алдаа гарлаа. Дахин оролдоно уу.');
       setLoading(false);
     }
   };
@@ -60,7 +60,7 @@ function DestinationDetail() {
       );
 
       setBookingStatus('success');
-      setBookingMessage('Reservation confirmed! Redirecting to your profile...');
+      setBookingMessage('Захиалга баталгаажлаа! Таны профайл руу шилжиж байна...');
       
       setTimeout(() => {
         navigate('/profile');
@@ -68,7 +68,7 @@ function DestinationDetail() {
     } catch (error) {
       console.error('Booking error:', error);
       setBookingStatus('error');
-      setBookingMessage(error.response?.data?.message || 'Failed to create reservation. Please try again.');
+      setBookingMessage(error.response?.data?.message || 'Захиалга үүсгэхэд алдаа гарлаа. Дахин оролдоно уу.');
       
       setTimeout(() => {
         setBookingStatus('idle');
@@ -93,17 +93,17 @@ function DestinationDetail() {
     if (!item) return 'Contact Us';
     switch(item.category) {
       case 'room':
-        return 'Book This Room';
+        return 'Өрөө захиалах';
       case 'dining':
-        return 'Make Reservation';
+        return 'Захиалга хийх';
       case 'activity':
-        return 'Book Activity';
+        return 'Үйл ажиллагаа захиалах';
       case 'event':
-        return 'Register for Event';
+        return 'Арга хэмжээнд бүртгүүлэх';
       case 'offer':
-        return 'Claim This Offer';
+        return 'Санал авах';
       default:
-        return 'Inquire Now';
+        return 'Одоо лавлах';
     }
   };
 
@@ -111,17 +111,17 @@ function DestinationDetail() {
     if (!item) return '';
     switch(item.category) {
       case 'room':
-        return 'Accommodation';
+        return 'Байрлал';
       case 'dining':
-        return 'Dining Experience';
+        return 'Хоол хүнсний туршлага';
       case 'activity':
-        return 'Activity';
+        return 'Үйл ажиллагаа';
       case 'event':
-        return 'Special Event';
+        return 'Тусгай арга хэмжээ';
       case 'offer':
-        return 'Special Offer';
+        return 'Тусгай санал';
       default:
-        return 'Resort Feature';
+        return 'Ресортын онцлог';
     }
   };
 
@@ -129,7 +129,7 @@ function DestinationDetail() {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50">
         <div className="text-4xl mb-4">🏔️</div>
-        <div className="text-xl text-amber-800">Loading...</div>
+        <div className="text-xl text-amber-800">Уншиж байна...</div>
       </div>
     );
   }
@@ -137,12 +137,12 @@ function DestinationDetail() {
   if (error || !item) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50">
-        <div className="text-2xl text-red-600 mb-4">{error || 'Item not found'}</div>
+        <div className="text-2xl text-red-600 mb-4">{error || 'Мэдээлэл олдсонгүй'}</div>
         <button
           onClick={() => navigate('/')}
           className="px-6 py-3 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition"
         >
-          Return to Home
+          Нүүр хуудас руу буцах
         </button>
       </div>
     );
@@ -175,7 +175,7 @@ function DestinationDetail() {
             onClick={() => navigate('/')}
             className="text-amber-800 hover:text-amber-900 font-medium flex items-center"
           >
-            ← Back to Home
+            ← Нүүр хуудас руу буцах
           </button>
         </div>
       </div>
@@ -255,7 +255,7 @@ function DestinationDetail() {
                 <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
                   <div>
                     <p className="text-gray-600 mb-2">
-                      {item.category === 'room' ? 'Starting from' : 'Price'}
+                      {item.category === 'room' ? 'Эхлэх үнэ' : 'Үнэ'}
                     </p>
                     <div className="flex items-baseline gap-3">
                       <span className="text-5xl font-bold text-amber-800">{item.price}</span>
@@ -265,7 +265,7 @@ function DestinationDetail() {
                     </div>
                     {item.duration && (
                       <p className="text-gray-600 mt-2">
-                        {item.category === 'room' ? 'Per night' : item.duration}
+                        {item.category === 'room' ? 'Шөнөд' : item.duration}
                       </p>
                     )}
                   </div>
@@ -278,7 +278,7 @@ function DestinationDetail() {
                         : 'bg-amber-800 text-white hover:bg-amber-900'
                     }`}
                   >
-                    {bookingStatus === 'loading' ? 'Processing...' : getButtonText()}
+                    {bookingStatus === 'loading' ? 'Боловсруулж байна...' : getButtonText()}
                   </button>
                 </div>
               </div>
@@ -286,7 +286,7 @@ function DestinationDetail() {
 
             {/* Description */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Description</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">Тайлбар</h2>
               <p className="text-gray-700 leading-relaxed text-lg whitespace-pre-line">
                 {item.description}
               </p>
@@ -294,15 +294,15 @@ function DestinationDetail() {
 
             {/* Call to Action */}
             <div className="bg-gradient-to-r from-amber-800 to-amber-900 rounded-lg p-8 text-white text-center mb-8">
-              <h3 className="text-3xl font-bold mb-3">Ready to Experience This?</h3>
+              <h3 className="text-3xl font-bold mb-3">Үүнийг мэдрэхэд бэлэн үү?</h3>
               <p className="text-lg mb-6 opacity-90">
-                {item.category === 'room' ? 'Reserve your stay and enjoy luxury in nature.' :
-                 item.category === 'dining' ? 'Make your reservation for an unforgettable dining experience.' :
-                 item.category === 'activity' ? 'Join us for an adventure you\'ll never forget.' :
-                 'Contact us to learn more and make your reservation.'}
+                {item.category === 'room' ? 'Хонолтоо захиалаад байгальд тансаг амралт эдэлнэ үү.' :
+                 item.category === 'dining' ? 'Мартагдашгүй хоол хүнсний туршлагын захиалгаа хийнэ үү.' :
+                 item.category === 'activity' ? 'Хэзээ ч мартагдахааргүй адал явдалд бидэнтэй нэгдэнэ үү.' :
+                 'Дэлгэрэнгүй мэдэхийн тулд бидэнтэй холбоо барьж захиалгаа хийнэ үү.'}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button 
+                <button
                   onClick={handleBooking}
                   disabled={bookingStatus === 'loading'}
                   className={`px-8 py-4 rounded-lg text-lg font-semibold transition ${
@@ -311,13 +311,13 @@ function DestinationDetail() {
                       : 'bg-white text-amber-900 hover:bg-gray-100'
                   }`}
                 >
-                  {bookingStatus === 'loading' ? 'Processing...' : getButtonText()}
+                  {bookingStatus === 'loading' ? 'Боловсруулж байна...' : getButtonText()}
                 </button>
-                <button 
+                <button
                   onClick={() => navigate('/#contact')}
                   className="px-8 py-4 bg-transparent border-2 border-white text-white rounded-lg font-semibold hover:bg-white hover:text-amber-900 transition text-lg"
                 >
-                  Contact Us
+                  Холбоо барих
                 </button>
               </div>
             </div>
@@ -336,7 +336,7 @@ function DestinationDetail() {
             onClick={() => navigate('/')}
             className="text-amber-800 hover:text-amber-900 font-semibold text-lg"
           >
-            ← Explore More Options
+            ← Бусад сонголтуудыг үзэх
           </button>
         </div>
       </div>

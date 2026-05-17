@@ -12,11 +12,10 @@ function Footer({ isAuthenticated, isAdmin }) {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <span className="text-3xl">🏔️</span>
-              <h3 className="text-xl font-bold">Red Rock Resort</h3>
+              <h3 className="text-xl font-bold">Улаан Хад Ресорт</h3>
             </div>
             <p className="text-gray-400 text-sm mb-4">
-              A luxury retreat nestled in the heart of Terelj National Park, 
-              offering world-class hospitality and unforgettable experiences.
+              Горхи-Тэрэлж Үндэсний Цэцэрлэгт Хүрээлэнгийн зүрхэнд байрлах тансаг амралтын газар — дэлхийн түвшний зочломтгой байдал болон мартагдашгүй туршлагыг санал болгодог.
             </p>
             <div className="flex space-x-3">
               <a href="https://facebook.com" className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-amber-800 transition">
@@ -33,39 +32,39 @@ function Footer({ isAuthenticated, isAdmin }) {
 
           {/* Quick Links */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Quick Links</h4>
+            <h4 className="text-lg font-semibold mb-4">Хурдан холбоосууд</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <a href="#rooms" className="text-gray-400 hover:text-white transition">
-                  Rooms & Suites
+                  Өрөө ба Бүхлийн өрөөнүүд
                 </a>
               </li>
               <li>
                 <a href="#dining" className="text-gray-400 hover:text-white transition">
-                  Dining
+                  Хоол хүнс
                 </a>
               </li>
               <li>
                 <a href="#activities" className="text-gray-400 hover:text-white transition">
-                  Activities
+                  Үйл ажиллагаа
                 </a>
               </li>
               <li>
                 <a href="#about" className="text-gray-400 hover:text-white transition">
-                  About Us
+                  Бидний тухай
                 </a>
               </li>
               {isAuthenticated && (
                 <li>
                   <Link to="/profile" className="text-gray-400 hover:text-white transition">
-                    My Account
+                    Миний данс
                   </Link>
                 </li>
               )}
               {isAdmin && (
                 <li>
                   <Link to="/admin" className="text-amber-400 hover:text-amber-300 transition">
-                    Admin Dashboard
+                    Админ самбар
                   </Link>
                 </li>
               )}
@@ -74,11 +73,11 @@ function Footer({ isAuthenticated, isAdmin }) {
 
           {/* Contact Info */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Contact Us</h4>
+            <h4 className="text-lg font-semibold mb-4">Холбоо барих</h4>
             <ul className="space-y-3 text-sm text-gray-400">
               <li className="flex items-start">
                 <span className="mr-2">📍</span>
-                <span>Terelj National Park<br/>Ulaanbaatar, Mongolia</span>
+                <span>Горхи-Тэрэлж Үндэсний Цэцэрлэгт Хүрээлэн<br/>Улаанбаатар, Монгол</span>
               </li>
               <li className="flex items-center">
                 <span className="mr-2">📞</span>
@@ -94,25 +93,25 @@ function Footer({ isAuthenticated, isAdmin }) {
               </li>
               <li className="flex items-center">
                 <span className="mr-2">⏰</span>
-                <span>24/7 Reception</span>
+                <span>24/7 Бүртгэл</span>
               </li>
             </ul>
           </div>
 
           {/* Newsletter */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">Stay Updated</h4>
+            <h4 className="text-lg font-semibold mb-4">Мэдэгдэл авах</h4>
             <p className="text-sm text-gray-400 mb-4">
-              Subscribe to receive exclusive offers and updates.
+              Онцгой санал болон шинэчлэлтүүдийг хүлээн авахын тулд бүртгүүлнэ үү.
             </p>
             <div className="flex flex-col space-y-2">
               <input
                 type="email"
-                placeholder="Your email"
+                placeholder="Таны и-мэйл"
                 className="px-4 py-2 rounded-lg text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-amber-600"
               />
               <button className="px-4 py-2 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition text-sm font-semibold">
-                Subscribe
+                Бүртгүүлэх
               </button>
             </div>
           </div>
@@ -120,13 +119,13 @@ function Footer({ isAuthenticated, isAdmin }) {
 
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
-          <p>&copy; {currentYear} Red Rock Resort. All rights reserved.</p>
+          <p>&copy; {currentYear} Улаан Хад Ресорт. Бүх эрх хуулиар хамгаалагдсан.</p>
           <div className="flex space-x-4 mt-4 md:mt-0">
-            <a href="#" className="hover:text-white transition">Privacy Policy</a>
+            <a href="#" className="hover:text-white transition">Нууцлалын бодлого</a>
             <span>•</span>
-            <a href="#" className="hover:text-white transition">Terms & Conditions</a>
+            <a href="#" className="hover:text-white transition">Үйлчилгээний нөхцөл</a>
             <span>•</span>
-            <a href="#" className="hover:text-white transition">Cancellation Policy</a>
+            <a href="#" className="hover:text-white transition">Цуцлалтын бодлого</a>
           </div>
         </div>
       </div>

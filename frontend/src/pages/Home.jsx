@@ -65,7 +65,7 @@ function Home({ searchParams }) {
       <div className="flex justify-center items-center h-screen bg-gray-50">
         <div className="text-center">
           <div className="text-4xl mb-4">🏔️</div>
-          <div className="text-2xl text-amber-800">Loading...</div>
+          <div className="text-2xl text-amber-800">Уншиж байна...</div>
         </div>
       </div>
     );
@@ -93,26 +93,26 @@ function Home({ searchParams }) {
       >
         <div className="absolute inset-0 bg-black bg-opacity-40"></div>
         <div className="relative z-10 text-center text-white px-4 max-w-4xl">
-          <h1 className="text-6xl md:text-7xl font-bold mb-4 drop-shadow-lg">Red Rock Resort</h1>
-          <p className="text-2xl md:text-3xl mb-8 font-light drop-shadow-lg">Luxury Retreat in Nature's Embrace</p>
+          <h1 className="text-6xl md:text-7xl font-bold mb-4 drop-shadow-lg">Улаан Хад Ресорт</h1>
+          <p className="text-2xl md:text-3xl mb-8 font-light drop-shadow-lg">Байгалийн тэвэрт тансаг амралт</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
+            <button
               onClick={() => {
                 const element = document.getElementById('rooms');
                 element?.scrollIntoView({ behavior: 'smooth' });
               }}
               className="px-8 py-4 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition font-semibold text-lg shadow-lg"
             >
-              Explore Rooms
+              Өрөөнүүдийг үзэх
             </button>
-            <button 
+            <button
               onClick={() => {
                 const element = document.getElementById('contact');
                 element?.scrollIntoView({ behavior: 'smooth' });
               }}
               className="px-8 py-4 bg-white text-amber-900 rounded-lg hover:bg-gray-100 transition font-semibold text-lg shadow-lg"
             >
-              Contact Us
+              Холбоо барих
             </button>
           </div>
         </div>
@@ -122,28 +122,27 @@ function Home({ searchParams }) {
       <section id="about" className={`py-20 bg-white ${sectionClass}`}>
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Welcome to Paradise</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Диваажинд тавтай морил</h2>
             <div className="w-24 h-1 bg-amber-800 mx-auto mb-6"></div>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Nestled in the heart of Terelj National Park, Red Rock Resort offers an unparalleled 
-              blend of luxury and nature. Experience tranquility, adventure, and world-class hospitality.
+              Горхи-Тэрэлж Үндэсний Цэцэрлэгт Хүрээлэнгийн зүрхэнд байрлах Улаан Хад Ресорт нь тансаг байдал болон байгалийн хосгүй хослолыг санал болгодог. Тайван байдал, адал явдал болон дэлхийн түвшний зочломтгой байдлыг мэдэрнэ үү.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center p-6">
               <div className="text-5xl mb-4">🏔️</div>
-              <h3 className="text-xl font-bold mb-2">Stunning Location</h3>
-              <p className="text-gray-600">Surrounded by majestic mountains and pristine nature</p>
+              <h3 className="text-xl font-bold mb-2">Гайхалтай байршил</h3>
+              <p className="text-gray-600">Сүртэй уулс болон цэвэр байгальд хүрээлэгдсэн</p>
             </div>
             <div className="text-center p-6">
               <div className="text-5xl mb-4">⭐</div>
-              <h3 className="text-xl font-bold mb-2">5-Star Service</h3>
-              <p className="text-gray-600">Exceptional hospitality and personalized attention</p>
+              <h3 className="text-xl font-bold mb-2">5 оддын үйлчилгээ</h3>
+              <p className="text-gray-600">Онцгой зочломтгой байдал болон хувийн анхаарал</p>
             </div>
             <div className="text-center p-6">
               <div className="text-5xl mb-4">🍽️</div>
-              <h3 className="text-xl font-bold mb-2">Fine Dining</h3>
-              <p className="text-gray-600">Exquisite cuisine featuring local and international flavors</p>
+              <h3 className="text-xl font-bold mb-2">Дэгжин хоол</h3>
+              <p className="text-gray-600">Орон нутгийн болон олон улсын амтыг агуулсан гурмэ хоол</p>
             </div>
           </div>
         </div>
@@ -153,9 +152,9 @@ function Home({ searchParams }) {
       <section id="rooms" className={`py-20 bg-gray-50 ${sectionClass}`}>
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Rooms & Suites</h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Өрөө ба Бүхлийн өрөөнүүд</h2>
             <div className="w-24 h-1 bg-amber-800 mx-auto mb-6"></div>
-            <p className="text-xl text-gray-600">Luxurious accommodations designed for your comfort</p>
+            <p className="text-xl text-gray-600">Таны тав тухыг хангахаар зориулалттай тансаг байр</p>
           </div>
 
           {rooms.length > 0 ? (
@@ -178,10 +177,10 @@ function Home({ searchParams }) {
                     <p className="text-gray-600 mb-4 line-clamp-2">{room.description}</p>
                     <div className="flex justify-between items-center mb-4">
                       <div className="text-2xl font-bold text-amber-800">{room.price}</div>
-                      <div className="text-gray-500 text-sm">per night</div>
+                      <div className="text-gray-500 text-sm">шөнөд</div>
                     </div>
                     <button className="w-full py-3 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition font-semibold">
-                      View Details
+                      Дэлгэрэнгүй үзэх
                     </button>
                   </div>
                 </div>
@@ -189,8 +188,8 @@ function Home({ searchParams }) {
             </div>
           ) : (
             <div className="text-center py-12 text-gray-500">
-              <p className="text-xl">Our rooms will be available soon.</p>
-              <p className="text-sm mt-2">Check back later or contact us for more information.</p>
+              <p className="text-xl">Манай өрөөнүүд удахгүй боломжтой болно.</p>
+              <p className="text-sm mt-2">Дахин шалгана уу эсвэл дэлгэрэнгүй мэдээлэл авахаар бидэнтэй холбоо барина уу.</p>
             </div>
           )}
         </div>
@@ -201,9 +200,9 @@ function Home({ searchParams }) {
         <section id="dining" className={`py-20 bg-white ${sectionClass}`}>
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">Dining Experience</h2>
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Хоол хүнсний туршлага</h2>
               <div className="w-24 h-1 bg-amber-800 mx-auto mb-6"></div>
-              <p className="text-xl text-gray-600">Savor exquisite flavors in stunning settings</p>
+              <p className="text-xl text-gray-600">Гайхалтай орчинд гурмэ амтыг мэдэрнэ үү</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -225,7 +224,7 @@ function Home({ searchParams }) {
                       <h3 className="text-2xl font-bold text-gray-900 mb-3">{item.title}</h3>
                       <p className="text-gray-600 mb-4 line-clamp-3">{item.description}</p>
                       <button className="self-start px-6 py-2 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition">
-                        Learn More
+                        Дэлгэрэнгүй
                       </button>
                     </div>
                   </div>
@@ -241,9 +240,9 @@ function Home({ searchParams }) {
         <section id="activities" className={`py-20 bg-gray-50 ${sectionClass}`}>
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">Activities & Experiences</h2>
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Үйл ажиллагаа ба туршлага</h2>
               <div className="w-24 h-1 bg-amber-800 mx-auto mb-6"></div>
-              <p className="text-xl text-gray-600">Adventure awaits at every turn</p>
+              <p className="text-xl text-gray-600">Адал явдал хаа сайгүй хүлээж байна</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -264,7 +263,7 @@ function Home({ searchParams }) {
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{activity.title}</h3>
                     <p className="text-gray-600 mb-4 line-clamp-3">{activity.description}</p>
                     <button className="text-amber-800 font-semibold hover:text-amber-900">
-                      Learn More →
+                      Дэлгэрэнгүй →
                     </button>
                   </div>
                 </div>
@@ -279,9 +278,9 @@ function Home({ searchParams }) {
         <section id="events" className={`py-20 bg-white ${sectionClass}`}>
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">Resort Events</h2>
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Ресортын арга хэмжээ</h2>
               <div className="w-24 h-1 bg-amber-800 mx-auto mb-6"></div>
-              <p className="text-xl text-gray-600">Join us for exclusive events and celebrations</p>
+              <p className="text-xl text-gray-600">Онцгой арга хэмжээ болон баяр ёслолд бидэнтэй нэгдэнэ үү</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -299,7 +298,7 @@ function Home({ searchParams }) {
                     />
                     {event.featured && (
                       <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full font-bold text-sm">
-                        Featured
+                        Онцлох
                       </div>
                     )}
                   </div>
@@ -308,7 +307,7 @@ function Home({ searchParams }) {
                     <p className="text-gray-600 mb-4 line-clamp-3">{event.description}</p>
                     <div className="text-amber-800 font-bold text-lg mb-4">{event.price}</div>
                     <button className="w-full py-2 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition font-semibold">
-                      Learn More
+                      Дэлгэрэнгүй
                     </button>
                   </div>
                 </div>
@@ -323,9 +322,9 @@ function Home({ searchParams }) {
         <section id="offers" className={`py-20 bg-amber-50 ${sectionClass}`}>
           <div className="max-w-7xl mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">Special Offers</h2>
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Тусгай санал</h2>
               <div className="w-24 h-1 bg-amber-800 mx-auto mb-6"></div>
-              <p className="text-xl text-gray-600">Exclusive deals for unforgettable stays</p>
+              <p className="text-xl text-gray-600">Мартагдашгүй хонолтын онцгой хэлэлцээр</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -357,7 +356,7 @@ function Home({ searchParams }) {
                       )}
                     </div>
                     <button className="w-full py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold">
-                      Book This Offer
+                      Энэ саналыг захиалах
                     </button>
                   </div>
                 </div>
@@ -370,32 +369,32 @@ function Home({ searchParams }) {
       {/* Contact Section */}
       <section id="contact" className={`py-20 bg-gray-900 text-white ${sectionClass}`}>
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-4">Plan Your Stay</h2>
+          <h2 className="text-4xl font-bold mb-4">Хонолтоо төлөвлөх</h2>
           <div className="w-24 h-1 bg-amber-600 mx-auto mb-6"></div>
-          <p className="text-xl mb-8">Ready to experience luxury in nature? Contact us today.</p>
+          <p className="text-xl mb-8">Байгальд тансаг амралт эдлэхэд бэлэн үү? Өнөөдөр бидэнтэй холбоо барина уу.</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
             <div>
               <div className="text-3xl mb-2">📞</div>
-              <p className="font-semibold">Call Us</p>
+              <p className="font-semibold">Залгах</p>
               <a href="tel:+97611123456" className="text-gray-400 hover:text-white transition">
                 +976 11 123 456
               </a>
             </div>
             <div>
               <div className="text-3xl mb-2">✉️</div>
-              <p className="font-semibold">Email Us</p>
+              <p className="font-semibold">Имэйл бичих</p>
               <a href="mailto:info@redrockresort.mn" className="text-gray-400 hover:text-white transition">
                 info@redrockresort.mn
               </a>
             </div>
             <div>
               <div className="text-3xl mb-2">📍</div>
-              <p className="font-semibold">Visit Us</p>
-              <p className="text-gray-400">Terelj National Park</p>
+              <p className="font-semibold">Зочлох</p>
+              <p className="text-gray-400">Горхи-Тэрэлж Үндэсний Цэцэрлэгт Хүрээлэн</p>
             </div>
           </div>
           <button className="px-8 py-4 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition font-semibold text-lg">
-            Book Your Escape Now
+            Одоо захиалах
           </button>
         </div>
       </section>

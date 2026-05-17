@@ -10,11 +10,11 @@ function TopBar({ isAuthenticated, isAdmin, userName, onLogout, onSearch }) {
   const location = useLocation();
 
   const categories = [
-    { value: 'all', label: 'All', icon: '🏨' },
-    { value: 'room', label: 'Rooms', icon: '🛏️' },
-    { value: 'dining', label: 'Dining', icon: '🍽️' },
-    { value: 'activity', label: 'Activities', icon: '🎯' },
-    { value: 'event', label: 'Events', icon: '🎉' }
+    { value: 'all', label: 'Бүгд', icon: '🏨' },
+    { value: 'room', label: 'Өрөөнүүд', icon: '🛏️' },
+    { value: 'dining', label: 'Хоол хүнс', icon: '🍽️' },
+    { value: 'activity', label: 'Үйл ажиллагаа', icon: '🎯' },
+    { value: 'event', label: 'Арга хэмжээ', icon: '🎉' }
   ];
 
   const handleSearch = (e) => {
@@ -58,42 +58,42 @@ function TopBar({ isAuthenticated, isAdmin, userName, onLogout, onSearch }) {
           <Link to="/" className="flex items-center space-x-3 flex-shrink-0" onClick={() => window.scrollTo(0, 0)}>
             <div className="text-3xl">🏔️</div>
             <div>
-              <div className="text-xl md:text-2xl font-bold text-amber-900">Red Rock Resort</div>
-              <div className="text-xs text-gray-600 italic hidden md:block">Luxury Retreat in Nature</div>
+              <div className="text-xl md:text-2xl font-bold text-amber-900">Улаан Хад Ресорт</div>
+              <div className="text-xs text-gray-600 italic hidden md:block">Байгалийн тэвэрт тансаг амралт</div>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-6">
-            <button 
+            <button
               onClick={() => scrollToSection('rooms')}
               className="text-sm text-gray-700 hover:text-amber-800 transition font-medium whitespace-nowrap"
             >
-              Rooms
+              Өрөөнүүд
             </button>
-            <button 
+            <button
               onClick={() => scrollToSection('dining')}
               className="text-sm text-gray-700 hover:text-amber-800 transition font-medium whitespace-nowrap"
             >
-              Dining
+              Хоол хүнс
             </button>
-            <button 
+            <button
               onClick={() => scrollToSection('activities')}
               className="text-sm text-gray-700 hover:text-amber-800 transition font-medium whitespace-nowrap"
             >
-              Activities
+              Үйл ажиллагаа
             </button>
-            <Link 
+            <Link
               to="/events"
               className="text-sm text-gray-700 hover:text-amber-800 transition font-medium whitespace-nowrap"
             >
-              Events
+              Арга хэмжээ
             </Link>
-            <button 
+            <button
               onClick={() => scrollToSection('contact')}
               className="text-sm text-gray-700 hover:text-amber-800 transition font-medium whitespace-nowrap"
             >
-              Contact
+              Холбоо барих
             </button>
           </nav>
 
@@ -116,7 +116,7 @@ function TopBar({ isAuthenticated, isAdmin, userName, onLogout, onSearch }) {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search..."
+                placeholder="Хайх..."
                 className="px-3 py-2 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm w-32 lg:w-40"
               />
               <button
@@ -151,14 +151,14 @@ function TopBar({ isAuthenticated, isAdmin, userName, onLogout, onSearch }) {
                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl py-2 border border-gray-200 z-50">
                       <div className="px-4 py-2 border-b border-gray-100">
                         <p className="font-semibold text-gray-900 text-sm">{userName}</p>
-                        <p className="text-xs text-gray-500">Guest Account</p>
+                        <p className="text-xs text-gray-500">Зочны данс</p>
                       </div>
                       <Link
                         to="/profile"
                         onClick={() => setShowProfileMenu(false)}
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 transition"
                       >
-                        👤 My Profile
+                        👤 Миний профайл
                       </Link>
                       {isAdmin && (
                         <Link
@@ -166,7 +166,7 @@ function TopBar({ isAuthenticated, isAdmin, userName, onLogout, onSearch }) {
                           onClick={() => setShowProfileMenu(false)}
                           className="block px-4 py-2 text-sm text-amber-800 font-semibold hover:bg-amber-50 transition"
                         >
-                          ⚙️ Admin Dashboard
+                          ⚙️ Админ самбар
                         </Link>
                       )}
                       <div className="border-t border-gray-100 mt-2">
@@ -174,7 +174,7 @@ function TopBar({ isAuthenticated, isAdmin, userName, onLogout, onSearch }) {
                           onClick={handleLogout}
                           className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition"
                         >
-                          🚪 Sign Out
+                          🚪 Гарах
                         </button>
                       </div>
                     </div>
@@ -187,13 +187,13 @@ function TopBar({ isAuthenticated, isAdmin, userName, onLogout, onSearch }) {
                   to="/login"
                   className="px-3 py-2 text-amber-800 hover:bg-amber-50 rounded-lg transition font-medium text-sm"
                 >
-                  Sign In
+                  Нэвтрэх
                 </Link>
                 <Link
                   to="/register"
                   className="px-4 py-2 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition font-medium text-sm"
                 >
-                  Register
+                  Бүртгүүлэх
                 </Link>
               </div>
             )}
@@ -218,7 +218,7 @@ function TopBar({ isAuthenticated, isAdmin, userName, onLogout, onSearch }) {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search..."
+              placeholder="Хайх..."
               className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-amber-500 text-sm"
             />
             <button
@@ -233,23 +233,23 @@ function TopBar({ isAuthenticated, isAdmin, userName, onLogout, onSearch }) {
         {/* Mobile Navigation */}
         <nav className="lg:hidden pb-3 flex flex-wrap gap-2 justify-center text-xs">
           <button onClick={() => scrollToSection('rooms')} className="text-gray-700 hover:text-amber-800 px-2 py-1">
-            Rooms
+            Өрөөнүүд
           </button>
           <span className="text-gray-400">•</span>
           <button onClick={() => scrollToSection('dining')} className="text-gray-700 hover:text-amber-800 px-2 py-1">
-            Dining
+            Хоол хүнс
           </button>
           <span className="text-gray-400">•</span>
           <button onClick={() => scrollToSection('activities')} className="text-gray-700 hover:text-amber-800 px-2 py-1">
-            Activities
+            Үйл ажиллагаа
           </button>
           <span className="text-gray-400">•</span>
           <Link to="/events" className="text-gray-700 hover:text-amber-800 px-2 py-1">
-            Events
+            Арга хэмжээ
           </Link>
           <span className="text-gray-400">•</span>
           <button onClick={() => scrollToSection('contact')} className="text-gray-700 hover:text-amber-800 px-2 py-1">
-            Contact
+            Холбоо барих
           </button>
         </nav>
       </div>
