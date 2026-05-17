@@ -5,28 +5,24 @@ function Footer({ isAuthenticated, isAdmin }) {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-900 text-white">
-      <div className="max-w-7xl mx-auto px-4 py-12">
+    <footer className="bg-gray-950 text-white border-t border-gray-800">
+      <div className="max-w-7xl mx-auto px-4 py-14">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Resort Info */}
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <span className="text-3xl">🏔️</span>
-              <h3 className="text-xl font-bold">Улаан Хад Ресорт</h3>
+            <div className="flex items-center space-x-3 mb-5">
+              <div className="w-10 h-10 bg-gradient-to-br from-amber-700 to-amber-900 rounded-xl flex items-center justify-center text-xl shadow-lg">
+                🏔️
+              </div>
+              <h3 className="text-xl font-bold text-white">Улаан Хад Ресорт</h3>
             </div>
-            <p className="text-gray-400 text-sm mb-4">
+            <p className="text-gray-400 text-sm mb-5 leading-relaxed">
               Горхи-Тэрэлж Үндэсний Цэцэрлэгт Хүрээлэнгийн зүрхэнд байрлах тансаг амралтын газар — дэлхийн түвшний зочломтгой байдал болон мартагдашгүй туршлагыг санал болгодог.
             </p>
             <div className="flex space-x-3">
-              <a href="https://facebook.com" className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-amber-800 transition">
-                <span className="text-sm">f</span>
-              </a>
-              <a href="https://instagram.com" className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-amber-800 transition">
-                <span className="text-sm">📷</span>
-              </a>
-              <a href="https://twitter.com" className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center hover:bg-amber-800 transition">
-                <span className="text-sm">𝕏</span>
-              </a>
+              <a href="https://facebook.com" className="w-9 h-9 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-amber-800 transition-colors text-sm font-bold">f</a>
+              <a href="https://instagram.com" className="w-9 h-9 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-amber-800 transition-colors text-sm">📷</a>
+              <a href="https://twitter.com" className="w-9 h-9 bg-gray-800 rounded-xl flex items-center justify-center hover:bg-amber-800 transition-colors text-sm">𝕏</a>
             </div>
           </div>
 
@@ -118,7 +114,7 @@ function Footer({ isAuthenticated, isAdmin }) {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+        <div className="border-t border-gray-800 mt-10 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
           <p>&copy; {currentYear} Улаан Хад Ресорт. Бүх эрх хуулиар хамгаалагдсан.</p>
           <div className="flex space-x-4 mt-4 md:mt-0">
             <a href="#" className="hover:text-white transition">Нууцлалын бодлого</a>

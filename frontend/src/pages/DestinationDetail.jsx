@@ -157,25 +157,28 @@ function DestinationDetail() {
     <div className="min-h-screen bg-gray-50">
       {/* Booking Status Messages */}
       {bookingStatus === 'success' && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-green-100 border border-green-400 text-green-700 px-6 py-4 rounded-lg shadow-lg max-w-md">
-          ✅ {bookingMessage}
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 bg-green-50 border border-green-300 text-green-800 px-6 py-4 rounded-2xl shadow-xl max-w-md flex items-center gap-3">
+          <span className="text-2xl">✅</span>
+          <span className="font-medium">{bookingMessage}</span>
         </div>
       )}
-      
+
       {bookingStatus === 'error' && (
-        <div className="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 bg-red-100 border border-red-400 text-red-700 px-6 py-4 rounded-lg shadow-lg max-w-md">
-          ❌ {bookingMessage}
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 bg-red-50 border border-red-300 text-red-800 px-6 py-4 rounded-2xl shadow-xl max-w-md flex items-center gap-3">
+          <span className="text-2xl">❌</span>
+          <span className="font-medium">{bookingMessage}</span>
         </div>
       )}
 
       {/* Breadcrumb */}
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-4">
+      <div className="bg-white border-b border-gray-100 shadow-sm">
+        <div className="max-w-6xl mx-auto px-4 py-3">
           <button
             onClick={() => navigate('/')}
-            className="text-amber-800 hover:text-amber-900 font-medium flex items-center"
+            className="text-amber-800 hover:text-amber-900 font-medium flex items-center gap-1 text-sm group"
           >
-            ← Нүүр хуудас руу буцах
+            <span className="group-hover:-translate-x-1 transition-transform inline-block">←</span>
+            Нүүр хуудас руу буцах
           </button>
         </div>
       </div>
@@ -183,7 +186,7 @@ function DestinationDetail() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Category Badge */}
         <div className="mb-4">
-          <span className="inline-block px-4 py-2 bg-amber-100 text-amber-900 rounded-full text-sm font-semibold">
+          <span className="inline-block px-4 py-1.5 bg-amber-100 text-amber-800 rounded-full text-sm font-semibold border border-amber-200">
             {getCategoryLabel()}
           </span>
         </div>

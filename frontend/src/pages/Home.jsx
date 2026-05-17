@@ -83,7 +83,7 @@ function Home({ searchParams }) {
   return (
     <div className="bg-gray-50">
       {/* Hero Section */}
-      <section 
+      <section
         id="hero"
         className="relative h-screen bg-cover bg-center flex items-center justify-center"
         style={{
@@ -91,105 +91,144 @@ function Home({ searchParams }) {
           backgroundAttachment: 'fixed'
         }}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-40"></div>
-        <div className="relative z-10 text-center text-white px-4 max-w-4xl">
-          <h1 className="text-6xl md:text-7xl font-bold mb-4 drop-shadow-lg">Улаан Хад Ресорт</h1>
-          <p className="text-2xl md:text-3xl mb-8 font-light drop-shadow-lg">Байгалийн тэвэрт тансаг амралт</p>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/35 to-black/60" />
+
+        <div className="relative z-10 text-center text-white px-4 max-w-5xl">
+          <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/25 rounded-full px-5 py-2 mb-6 text-sm font-medium">
+            <span>⭐⭐⭐⭐⭐</span>
+            <span>Горхи-Тэрэлжийн 5 оддын ресорт</span>
+          </div>
+          <h1 className="text-5xl md:text-7xl font-bold mb-5 leading-tight drop-shadow-xl">
+            Улаан Хад Ресорт
+          </h1>
+          <p className="text-xl md:text-2xl mb-10 font-light drop-shadow-lg text-white/90 max-w-2xl mx-auto">
+            Байгалийн тэвэрт тансаг амралт — Монгол орны хамгийн гайхалтай газар
+          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => {
-                const element = document.getElementById('rooms');
-                element?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="px-8 py-4 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition font-semibold text-lg shadow-lg"
+              onClick={() => document.getElementById('rooms')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-8 py-4 bg-amber-700 hover:bg-amber-600 text-white rounded-xl font-semibold text-lg shadow-xl transition-all active:scale-95 border border-amber-600"
             >
-              Өрөөнүүдийг үзэх
+              🛏️ Өрөөнүүдийг үзэх
             </button>
             <button
-              onClick={() => {
-                const element = document.getElementById('contact');
-                element?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              className="px-8 py-4 bg-white text-amber-900 rounded-lg hover:bg-gray-100 transition font-semibold text-lg shadow-lg"
+              onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })}
+              className="px-8 py-4 bg-white/15 hover:bg-white/25 backdrop-blur-sm text-white rounded-xl font-semibold text-lg shadow-xl transition-all active:scale-95 border border-white/40"
             >
-              Холбоо барих
+              📞 Холбоо барих
             </button>
           </div>
+          <div className="mt-16 flex items-center justify-center gap-8 md:gap-16 text-white/80">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-white">500+</div>
+              <div className="text-xs uppercase tracking-wider mt-1">Зочид</div>
+            </div>
+            <div className="w-px h-10 bg-white/30" />
+            <div className="text-center">
+              <div className="text-3xl font-bold text-white">4.9</div>
+              <div className="text-xs uppercase tracking-wider mt-1">Үнэлгээ</div>
+            </div>
+            <div className="w-px h-10 bg-white/30" />
+            <div className="text-center">
+              <div className="text-3xl font-bold text-white">10+</div>
+              <div className="text-xs uppercase tracking-wider mt-1">Жилийн туршлага</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/60 animate-bounce">
+          <div className="w-px h-8 bg-white/40" />
+          <span className="text-xs uppercase tracking-widest">Доош гүйлгэх</span>
         </div>
       </section>
 
       {/* About Section */}
-      <section id="about" className={`py-20 bg-white ${sectionClass}`}>
+      <section id="about" className={`py-24 bg-white ${sectionClass}`}>
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Диваажинд тавтай морил</h2>
-            <div className="w-24 h-1 bg-amber-800 mx-auto mb-6"></div>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <span className="inline-block text-amber-700 font-semibold text-sm uppercase tracking-wider mb-3 bg-amber-50 px-4 py-1 rounded-full border border-amber-200">
+              Бидний тухай
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-5">Диваажинд тавтай морил</h2>
+            <div className="w-16 h-1 bg-amber-700 mx-auto mb-6 rounded-full" />
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
               Горхи-Тэрэлж Үндэсний Цэцэрлэгт Хүрээлэнгийн зүрхэнд байрлах Улаан Хад Ресорт нь тансаг байдал болон байгалийн хосгүй хослолыг санал болгодог. Тайван байдал, адал явдал болон дэлхийн түвшний зочломтгой байдлыг мэдэрнэ үү.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center p-6">
-              <div className="text-5xl mb-4">🏔️</div>
-              <h3 className="text-xl font-bold mb-2">Гайхалтай байршил</h3>
-              <p className="text-gray-600">Сүртэй уулс болон цэвэр байгальд хүрээлэгдсэн</p>
-            </div>
-            <div className="text-center p-6">
-              <div className="text-5xl mb-4">⭐</div>
-              <h3 className="text-xl font-bold mb-2">5 оддын үйлчилгээ</h3>
-              <p className="text-gray-600">Онцгой зочломтгой байдал болон хувийн анхаарал</p>
-            </div>
-            <div className="text-center p-6">
-              <div className="text-5xl mb-4">🍽️</div>
-              <h3 className="text-xl font-bold mb-2">Дэгжин хоол</h3>
-              <p className="text-gray-600">Орон нутгийн болон олон улсын амтыг агуулсан гурмэ хоол</p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { icon: '🏔️', title: 'Гайхалтай байршил', desc: 'Сүртэй уулс болон цэвэр байгальд хүрээлэгдсэн', color: 'from-amber-50 to-orange-50', border: 'border-amber-100' },
+              { icon: '⭐', title: '5 оддын үйлчилгээ', desc: 'Онцгой зочломтгой байдал болон хувийн анхаарал', color: 'from-yellow-50 to-amber-50', border: 'border-yellow-100' },
+              { icon: '🍽️', title: 'Дэгжин хоол', desc: 'Орон нутгийн болон олон улсын амтыг агуулсан гурмэ хоол', color: 'from-orange-50 to-red-50', border: 'border-orange-100' }
+            ].map(({ icon, title, desc, color, border }) => (
+              <div key={title} className={`text-center p-8 rounded-2xl bg-gradient-to-br ${color} border ${border} hover:shadow-lg transition-all duration-300 hover:-translate-y-1`}>
+                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-md text-4xl">
+                  {icon}
+                </div>
+                <h3 className="text-xl font-bold mb-3 text-gray-900">{title}</h3>
+                <p className="text-gray-600 leading-relaxed">{desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Rooms Section */}
-      <section id="rooms" className={`py-20 bg-gray-50 ${sectionClass}`}>
+      <section id="rooms" className={`py-24 bg-gray-50 ${sectionClass}`}>
         <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Өрөө ба Бүхлийн өрөөнүүд</h2>
-            <div className="w-24 h-1 bg-amber-800 mx-auto mb-6"></div>
-            <p className="text-xl text-gray-600">Таны тав тухыг хангахаар зориулалттай тансаг байр</p>
+          <div className="text-center mb-14">
+            <span className="inline-block text-amber-700 font-semibold text-sm uppercase tracking-wider mb-3 bg-amber-50 px-4 py-1 rounded-full border border-amber-200">
+              Байрлал
+            </span>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-5">Өрөө ба Бүхлийн өрөөнүүд</h2>
+            <div className="w-16 h-1 bg-amber-700 mx-auto mb-5 rounded-full" />
+            <p className="text-lg text-gray-600">Таны тав тухыг хангахаар зориулалттай тансаг байр</p>
           </div>
 
           {rooms.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {rooms.map((room) => (
-                <div 
-                  key={room._id} 
+                <div
+                  key={room._id}
                   onClick={() => handleCardClick(room._id)}
-                  className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-2xl transition cursor-pointer transform hover:-translate-y-2 duration-300"
+                  className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 cursor-pointer group hover:-translate-y-2"
                 >
                   <div className="relative h-64 overflow-hidden">
-                    <img 
+                    <img
                       src={room.images[0] ? `${BASE_URL}${room.images[0]}` : 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=600'}
                       alt={room.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute top-4 left-4">
+                      <span className="bg-amber-800 text-white text-xs font-semibold px-3 py-1 rounded-full">🛏️ Өрөө</span>
+                    </div>
                   </div>
                   <div className="p-6">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{room.title}</h3>
-                    <p className="text-gray-600 mb-4 line-clamp-2">{room.description}</p>
-                    <div className="flex justify-between items-center mb-4">
-                      <div className="text-2xl font-bold text-amber-800">{room.price}</div>
-                      <div className="text-gray-500 text-sm">шөнөд</div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-amber-800 transition-colors">{room.title}</h3>
+                    <p className="text-gray-500 mb-5 line-clamp-2 text-sm leading-relaxed">{room.description}</p>
+                    <div className="flex justify-between items-end mb-5">
+                      <div>
+                        <span className="text-2xl font-bold text-amber-800">{room.price}</span>
+                        <span className="text-gray-400 text-sm ml-1">/ шөнөд</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-yellow-500 text-sm">
+                        ⭐⭐⭐⭐⭐
+                      </div>
                     </div>
-                    <button className="w-full py-3 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition font-semibold">
-                      Дэлгэрэнгүй үзэх
+                    <button className="w-full py-3 bg-amber-800 text-white rounded-xl hover:bg-amber-900 transition-colors font-semibold group-hover:shadow-lg group-hover:shadow-amber-800/30">
+                      Дэлгэрэнгүй үзэх →
                     </button>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 text-gray-500">
-              <p className="text-xl">Манай өрөөнүүд удахгүй боломжтой болно.</p>
-              <p className="text-sm mt-2">Дахин шалгана уу эсвэл дэлгэрэнгүй мэдээлэл авахаар бидэнтэй холбоо барина уу.</p>
+            <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm">
+              <div className="text-6xl mb-4">🏨</div>
+              <p className="text-xl font-semibold text-gray-700 mb-2">Манай өрөөнүүд удахгүй боломжтой болно.</p>
+              <p className="text-sm text-gray-500">Дахин шалгана уу эсвэл дэлгэрэнгүй мэдээлэл авахаар бидэнтэй холбоо барина уу.</p>
             </div>
           )}
         </div>
@@ -367,34 +406,43 @@ function Home({ searchParams }) {
       )}
 
       {/* Contact Section */}
-      <section id="contact" className={`py-20 bg-gray-900 text-white ${sectionClass}`}>
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-4">Хонолтоо төлөвлөх</h2>
-          <div className="w-24 h-1 bg-amber-600 mx-auto mb-6"></div>
-          <p className="text-xl mb-8">Байгальд тансаг амралт эдлэхэд бэлэн үү? Өнөөдөр бидэнтэй холбоо барина уу.</p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-            <div>
-              <div className="text-3xl mb-2">📞</div>
-              <p className="font-semibold">Залгах</p>
-              <a href="tel:+97611123456" className="text-gray-400 hover:text-white transition">
-                +976 11 123 456
-              </a>
-            </div>
-            <div>
-              <div className="text-3xl mb-2">✉️</div>
-              <p className="font-semibold">Имэйл бичих</p>
-              <a href="mailto:info@redrockresort.mn" className="text-gray-400 hover:text-white transition">
-                info@redrockresort.mn
-              </a>
-            </div>
-            <div>
-              <div className="text-3xl mb-2">📍</div>
-              <p className="font-semibold">Зочлох</p>
-              <p className="text-gray-400">Горхи-Тэрэлж Үндэсний Цэцэрлэгт Хүрээлэн</p>
-            </div>
+      <section id="contact" className={`py-24 relative overflow-hidden ${sectionClass}`}>
+        <div className="absolute inset-0 bg-gray-900" />
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=1600')", backgroundSize: 'cover', backgroundPosition: 'center' }} />
+
+        <div className="relative z-10 max-w-5xl mx-auto px-4 text-center">
+          <span className="inline-block text-amber-400 font-semibold text-sm uppercase tracking-wider mb-4 bg-amber-900/50 px-4 py-1 rounded-full border border-amber-700">
+            Холбоо барих
+          </span>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-5">Хонолтоо төлөвлөх</h2>
+          <div className="w-16 h-1 bg-amber-600 mx-auto mb-6 rounded-full" />
+          <p className="text-lg text-gray-300 mb-12 max-w-2xl mx-auto">
+            Байгальд тансаг амралт эдлэхэд бэлэн үү? Өнөөдөр бидэнтэй холбоо барина уу.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            {[
+              { icon: '📞', title: 'Залгах', content: '+976 11 123 456', href: 'tel:+97611123456' },
+              { icon: '✉️', title: 'Имэйл бичих', content: 'info@redrockresort.mn', href: 'mailto:info@redrockresort.mn' },
+              { icon: '📍', title: 'Зочлох', content: 'Горхи-Тэрэлж, Монгол', href: null }
+            ].map(({ icon, title, content, href }) => (
+              <div key={title} className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-6 hover:bg-white/15 transition-all">
+                <div className="text-4xl mb-3">{icon}</div>
+                <p className="font-semibold text-white mb-1">{title}</p>
+                {href ? (
+                  <a href={href} className="text-amber-300 hover:text-amber-200 transition text-sm">{content}</a>
+                ) : (
+                  <p className="text-gray-400 text-sm">{content}</p>
+                )}
+              </div>
+            ))}
           </div>
-          <button className="px-8 py-4 bg-amber-800 text-white rounded-lg hover:bg-amber-900 transition font-semibold text-lg">
-            Одоо захиалах
+
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="px-10 py-4 bg-amber-700 hover:bg-amber-600 text-white rounded-xl font-semibold text-lg shadow-xl shadow-amber-900/40 transition-all active:scale-95"
+          >
+            🏨 Одоо захиалах
           </button>
         </div>
       </section>

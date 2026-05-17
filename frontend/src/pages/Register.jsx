@@ -1,4 +1,3 @@
-// frontend/src/pages/Register.jsx
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api';
@@ -12,48 +11,36 @@ function Register({ onLogin }) {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       setError('Нууц үгнүүд таарахгүй байна');
       return;
     }
-
-    // Validate password length
     if (formData.password.length < 6) {
       setError('Нууц үг дор хаяж 6 тэмдэгт байх ёстой');
       return;
     }
 
     setLoading(true);
-
     try {
       const response = await api.post('/api/auth/register', {
         name: formData.name,
         email: formData.email,
         password: formData.password
       });
-      
-      // Save token and user data
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
-      
-      // Update authentication state
       onLogin(response.data.user);
-      
-      // Redirect to home
       navigate('/');
     } catch (error) {
       setError(error.response?.data?.message || 'Бүртгэлд алдаа гарлаа. Дахин оролдоно уу.');
@@ -63,101 +50,174 @@ function Register({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="text-center text-3xl font-extrabold text-gray-900">
-            Данс үүсгэх
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Эсвэл{' '}
-            <Link to="/login" className="font-medium text-blue-600 hover:text-blue-500">
-              одоо байгаа дансаар нэвтрэх
-            </Link>
-          </p>
+    <div className="min-h-screen flex">
+      {/* Left panel */}
+      <div className="hidden lg:flex lg:w-1/2 relative flex-col justify-between p-12 overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200"
+          alt="Resort"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-950/80 to-amber-800/60" />
+
+        <div className="relative z-10 flex items-center space-x-3">
+          <span className="text-4xl">🏔️</span>
+          <div>
+            <div className="text-xl font-bold text-white">Улаан Хад Ресорт</div>
+            <div className="text-xs text-amber-200">Байгалийн тэвэрт тансаг амралт</div>
+          </div>
         </div>
 
-        <form className="mt-8 space-y-6 bg-white p-8 rounded-lg shadow-md" onSubmit={handleSubmit}>
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-4 py-2 mb-6">
+            <span className="text-green-300">✓</span>
+            <span className="text-white text-sm font-medium">Бүртгэл үнэгүй</span>
+          </div>
+          <h2 className="text-4xl font-bold text-white mb-4 leading-tight">
+            Онцгой давуу<br />талуудыг эдлэх
+          </h2>
+          <div className="space-y-3">
+            {['Эрт захиалах боломж', 'Онцгой санал авах', 'Захиалгаа хянах', '24/7 дэмжлэг'].map((benefit) => (
+              <div key={benefit} className="flex items-center gap-3">
+                <span className="w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0">✓</span>
+                <span className="text-amber-100">{benefit}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Right panel - form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-white px-8 py-12">
+        <div className="w-full max-w-md">
+          {/* Mobile logo */}
+          <div className="flex lg:hidden items-center justify-center space-x-2 mb-8">
+            <span className="text-3xl">🏔️</span>
+            <span className="text-xl font-bold text-amber-900">Улаан Хад Ресорт</span>
+          </div>
+
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Данс үүсгэх</h1>
+            <p className="text-gray-500">
+              Данс байна уу?{' '}
+              <Link to="/login" className="font-semibold text-amber-800 hover:text-amber-900 underline underline-offset-2">
+                Нэвтрэх
+              </Link>
+            </p>
+          </div>
+
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
+            <div className="mb-6 flex items-start gap-3 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+              <span className="text-lg leading-none">⚠️</span>
+              <span>{error}</span>
             </div>
           )}
 
-          <div className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
                 Бүтэн нэр
               </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                required
-                value={formData.name}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Батболд Дорж"
-              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">👤</span>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition bg-gray-50 focus:bg-white"
+                  placeholder="Батболд Дорж"
+                />
+              </div>
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
                 И-мэйл хаяг
               </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="your@email.com"
-              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">✉️</span>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition bg-gray-50 focus:bg-white"
+                  placeholder="your@email.com"
+                />
+              </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
                 Нууц үг
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="••••••••"
-              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔒</span>
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-12 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition bg-gray-50 focus:bg-white"
+                  placeholder="Доод тал нь 6 тэмдэгт"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm"
+                >
+                  {showPassword ? '🙈' : '👁️'}
+                </button>
+              </div>
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
                 Нууц үг баталгаажуулах
               </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                required
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="••••••••"
-              />
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔒</span>
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition bg-gray-50 focus:bg-white"
+                  placeholder="••••••••"
+                />
+              </div>
             </div>
-          </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-          >
-            {loading ? 'Данс үүсгэж байна...' : 'Данс үүсгэх'}
-          </button>
-        </form>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3.5 bg-amber-800 text-white rounded-xl font-semibold text-base hover:bg-amber-900 active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-amber-800/30 mt-2"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                  </svg>
+                  Данс үүсгэж байна...
+                </span>
+              ) : 'Данс үүсгэх'}
+            </button>
+          </form>
+
+          <div className="mt-8 pt-6 border-t border-gray-100 text-center text-xs text-gray-400">
+            © {new Date().getFullYear()} Улаан Хад Ресорт. Бүх эрх хамгаалагдсан.
+          </div>
+        </div>
       </div>
     </div>
   );
