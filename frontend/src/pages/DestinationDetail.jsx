@@ -2,56 +2,203 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api, { getImageUrl } from '../api';
 import ReviewSection from '../components/ReviewSection';
+import { useFavorites } from '../hooks/useFavorites';
+
+// ── Availability Calendar ──────────────────────────────────────
+const MONTH_NAMES = ['1-р сар','2-р сар','3-р сар','4-р сар','5-р сар','6-р сар',
+                     '7-р сар','8-р сар','9-р сар','10-р сар','11-р сар','12-р сар'];
+const DAY_ABBR = ['Ня','Да','Мя','Лх','Пү','Ба','Бя'];
+
+function BookingCalendar({ bookedRanges, checkIn, checkOut, onChange }) {
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const [baseMonth, setBaseMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
+  const [hover, setHover] = useState(null);
+  const [phase, setPhase] = useState(checkIn && !checkOut ? 'out' : 'in');
+
+  const dk = d => d.toISOString().split('T')[0];
+
+  const isBooked = date => bookedRanges.some(r => {
+    const s = new Date(r.checkIn); s.setHours(0,0,0,0);
+    const e = new Date(r.checkOut); e.setHours(0,0,0,0);
+    return date >= s && date <= e;
+  });
+
+  const isDisabled = date => date < today || isBooked(date);
+
+  const selStart = checkIn ? new Date(checkIn) : null;
+  const previewEnd = phase === 'out' && hover && !isDisabled(hover) ? hover : null;
+  const selEnd = checkOut ? new Date(checkOut) : previewEnd;
+
+  const inRange = date => selStart && selEnd && date > selStart && date < selEnd;
+  const isStart = date => selStart && dk(date) === dk(selStart);
+  const isEnd = date => selEnd && dk(date) === dk(selEnd);
+
+  const handleClick = date => {
+    if (isDisabled(date)) return;
+    if (phase === 'in') {
+      onChange(dk(date), '');
+      setPhase('out');
+    } else if (selStart) {
+      if (date < selStart) {
+        onChange(dk(date), dk(selStart));
+      } else {
+        onChange(checkIn, dk(date));
+      }
+      setPhase('in');
+    }
+  };
+
+  const canGoPrev = new Date(baseMonth.getFullYear(), baseMonth.getMonth(), 1) > today;
+  const month2 = new Date(baseMonth.getFullYear(), baseMonth.getMonth() + 1, 1);
+
+  const renderMonth = first => {
+    const yr = first.getFullYear(), mo = first.getMonth();
+    const daysInMonth = new Date(yr, mo + 1, 0).getDate();
+    const startDow = first.getDay();
+    const cells = [
+      ...Array(startDow).fill(null),
+      ...Array.from({ length: daysInMonth }, (_, i) => new Date(yr, mo, i + 1)),
+    ];
+
+    return (
+      <div key={`${yr}-${mo}`} className="min-w-0">
+        <p className="text-center text-xs font-semibold text-gray-600 mb-2">
+          {MONTH_NAMES[mo]} {yr}
+        </p>
+        <div className="grid grid-cols-7 text-center select-none">
+          {DAY_ABBR.map(d => (
+            <div key={d} className="text-[10px] text-gray-400 font-medium py-1">{d}</div>
+          ))}
+          {cells.map((date, i) => {
+            if (!date) return <div key={`e${i}`} />;
+            const dis = isDisabled(date);
+            const book = isBooked(date);
+            const rng = inRange(date);
+            const st = isStart(date);
+            const en = isEnd(date);
+            const todayMark = dk(date) === dk(today);
+
+            return (
+              <button
+                key={date.getTime()}
+                type="button"
+                disabled={dis}
+                onClick={() => handleClick(date)}
+                onMouseEnter={() => phase === 'out' && setHover(date)}
+                onMouseLeave={() => setHover(null)}
+                className={[
+                  'h-7 w-7 mx-auto text-xs font-medium transition-all',
+                  dis ? 'cursor-not-allowed' : 'cursor-pointer',
+                  book ? 'text-gray-300 line-through' : '',
+                  st || en ? 'bg-amber-800 text-white rounded-full z-10' : '',
+                  rng ? 'bg-amber-100 text-amber-900' : '',
+                  !dis && !rng && !st && !en ? 'text-gray-700 hover:bg-amber-50 hover:text-amber-800 rounded-full' : '',
+                  !dis && !book && !rng && !st && !en ? '' : '',
+                  todayMark && !st && !en ? 'ring-1 ring-amber-500 rounded-full' : '',
+                ].filter(Boolean).join(' ')}
+              >
+                {date.getDate()}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="border border-gray-200 rounded-xl bg-white overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-gray-50 border-b border-gray-100">
+        <button type="button" onClick={() => setBaseMonth(new Date(baseMonth.getFullYear(), baseMonth.getMonth() - 1, 1))}
+          disabled={!canGoPrev}
+          className="p-1 rounded hover:bg-gray-200 disabled:opacity-30 transition text-gray-500 text-base leading-none">
+          ‹
+        </button>
+        <span className="text-xs font-medium text-gray-500">
+          {phase === 'in' ? 'Орох огноог сонгоно уу' : 'Гарах огноог сонгоно уу'}
+        </span>
+        <button type="button" onClick={() => setBaseMonth(new Date(baseMonth.getFullYear(), baseMonth.getMonth() + 1, 1))}
+          className="p-1 rounded hover:bg-gray-200 transition text-gray-500 text-base leading-none">
+          ›
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 px-4 py-3">
+        {renderMonth(baseMonth)}
+        {renderMonth(month2)}
+      </div>
+
+      <div className="px-4 pb-3 flex gap-4 text-[10px] text-gray-400">
+        <span className="flex items-center gap-1">
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-800 inline-block" /> Сонгосон
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="w-2.5 h-2.5 bg-amber-100 inline-block rounded-sm" /> Хугацаа
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="w-2.5 h-2.5 bg-gray-100 inline-block rounded-sm" /> Захиалагдсан
+        </span>
+      </div>
+    </div>
+  );
+}
 
 // ── Payment Modal ──────────────────────────────────────────────
 function PaymentModal({ item, onClose, onSuccess }) {
-  const [step, setStep] = useState(1); // 1=booking info, 2=payment
+  const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     checkIn: '', checkOut: '', guests: 1, notes: '',
     cardNumber: '', cardName: '', expiry: '', cvv: '',
   });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [bookedRanges, setBookedRanges] = useState([]);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-  const formatCard = (v) => v.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
-  const formatExpiry = (v) => {
+  const formatCard = v => v.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim();
+  const formatExpiry = v => {
     const d = v.replace(/\D/g, '').slice(0, 4);
     return d.length > 2 ? d.slice(0, 2) + '/' + d.slice(2) : d;
   };
 
-  // Шөнийн тоо
+  useEffect(() => {
+    api.get(`/api/reservations/availability/${item._id}`)
+      .then(res => setBookedRanges(res.data.bookedRanges || []))
+      .catch(() => {});
+  }, [item._id]);
+
   const nights = (() => {
     if (!form.checkIn || !form.checkOut) return 0;
     const ms = new Date(form.checkOut) - new Date(form.checkIn);
     return ms > 0 ? Math.floor(ms / 86400000) : 0;
   })();
 
-  // Шөнийн үнэ: priceValue (тоо) байвал шууд ашиглана, эс тэгвэл price string-с parse хийнэ
   const priceNum = (() => {
     if (item.priceValue && item.priceValue > 0) return item.priceValue;
     const digits = (item.price || '').replace(/[^\d]/g, '');
     return digits ? parseInt(digits, 10) : 0;
   })();
 
-  // Валютын тэмдэг
   const currency = (item.price || '').match(/[₮$€£¥]/)?.[0] || '₮';
-
-  // Нийт үнэ
   const isRoom = item.category === 'room';
   const totalNum = isRoom && nights > 0 && priceNum > 0 ? priceNum * nights : priceNum;
   const totalStr = totalNum > 0 ? `${currency}${totalNum.toLocaleString()}` : (item.price || '');
 
-  const handleSubmit = async (e) => {
+  const handleRangeChange = (ci, co) => {
+    set('checkIn', ci);
+    set('checkOut', co);
+    setError('');
+  };
+
+  const handleSubmit = async e => {
     e.preventDefault();
     if (step === 1) {
-      if (!form.checkIn || !form.checkOut) { setError('Орох болон гарах огноог оруулна уу'); return; }
+      if (!form.checkIn || !form.checkOut) { setError('Орох болон гарах огноог сонгоно уу'); return; }
       if (!nights) { setError('Гарах огноо орох огнооноос хойш байх ёстой'); return; }
       setError(''); setStep(2); return;
     }
 
-    // Step 2: payment
     const raw = form.cardNumber.replace(/\s/g, '');
     if (raw.length < 16) { setError('Картын дугаарыг зөв оруулна уу'); return; }
     if (!form.cardName.trim()) { setError('Картын нэрийг оруулна уу'); return; }
@@ -68,11 +215,8 @@ function PaymentModal({ item, onClose, onSuccess }) {
         guests: Number(form.guests),
         notes: form.notes,
         payment: {
-          status: 'paid',
-          method: 'card',
-          amount: totalStr,
-          cardLast4: raw.slice(-4),
-          paidAt: new Date().toISOString(),
+          status: 'paid', method: 'card', amount: totalStr,
+          cardLast4: raw.slice(-4), paidAt: new Date().toISOString(),
         },
       }, { headers: { Authorization: `Bearer ${token}` } });
       onSuccess();
@@ -84,10 +228,10 @@ function PaymentModal({ item, onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
 
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
           <div className="flex items-center gap-2">
             <div className="flex gap-1.5">
               {[1, 2].map(s => (
@@ -105,7 +249,7 @@ function PaymentModal({ item, onClose, onSuccess }) {
 
         <div className="overflow-y-auto flex-1">
           {/* Booking summary */}
-          <div className="px-6 py-4 bg-amber-50 border-b border-amber-100">
+          <div className="px-6 py-4 bg-amber-50 border-b border-amber-100 flex-shrink-0">
             <div className="flex items-center gap-3">
               {item.images?.[0] && (
                 <img src={getImageUrl(item.images[0])} alt="" className="w-14 h-14 rounded-xl object-cover flex-shrink-0" />
@@ -115,7 +259,7 @@ function PaymentModal({ item, onClose, onSuccess }) {
                 <p className="text-xs text-gray-500">{item.location}</p>
                 <p className="text-amber-800 font-bold text-sm mt-0.5">
                   {item.price}
-                  {item.category === 'room' && <span className="text-xs font-normal text-gray-500"> / шөнөд</span>}
+                  {isRoom && <span className="text-xs font-normal text-gray-500"> / шөнөд</span>}
                 </p>
               </div>
             </div>
@@ -128,30 +272,35 @@ function PaymentModal({ item, onClose, onSuccess }) {
 
             {step === 1 && (
               <>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Орох огноо</label>
-                    <input type="date" value={form.checkIn} min={new Date().toISOString().split('T')[0]}
-                      onChange={e => set('checkIn', e.target.value)} required
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-300" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-gray-600 mb-1">Гарах огноо</label>
-                    <input type="date" value={form.checkOut} min={form.checkIn || new Date().toISOString().split('T')[0]}
-                      onChange={e => set('checkOut', e.target.value)} required
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-300" />
-                  </div>
+                {/* Availability Calendar */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-2">
+                    Огноо сонгох
+                    {bookedRanges.length > 0 && (
+                      <span className="ml-2 text-red-400 font-normal">({bookedRanges.length} захиалагдсан хугацаа байна)</span>
+                    )}
+                  </label>
+                  <BookingCalendar
+                    bookedRanges={bookedRanges}
+                    checkIn={form.checkIn}
+                    checkOut={form.checkOut}
+                    onChange={handleRangeChange}
+                  />
                 </div>
 
-                {nights > 0 && (
+                {/* Selected range summary */}
+                {form.checkIn && form.checkOut && nights > 0 && (
                   <div className="bg-amber-50 border border-amber-100 rounded-lg px-4 py-2.5 text-sm text-amber-800">
                     <div className="flex items-center justify-between">
-                      <span>{nights} шөнө × {item.price}</span>
+                      <span>
+                        {new Date(form.checkIn).toLocaleDateString('mn-MN')} → {new Date(form.checkOut).toLocaleDateString('mn-MN')} · {nights} шөнө
+                      </span>
                       <span className="font-bold text-base">{totalStr}</span>
                     </div>
                   </div>
                 )}
 
+                {/* Guests */}
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">Зочдын тоо</label>
                   <select value={form.guests} onChange={e => set('guests', e.target.value)}
@@ -160,9 +309,11 @@ function PaymentModal({ item, onClose, onSuccess }) {
                   </select>
                 </div>
 
+                {/* Notes */}
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">Тусгай хүсэлт (заавал биш)</label>
-                  <textarea value={form.notes} onChange={e => set('notes', e.target.value)} rows={2} placeholder="Тусгай хүсэлт..."
+                  <textarea value={form.notes} onChange={e => set('notes', e.target.value)} rows={2}
+                    placeholder="Тусгай хүсэлт..."
                     className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-300 resize-none" />
                 </div>
 
@@ -175,49 +326,33 @@ function PaymentModal({ item, onClose, onSuccess }) {
 
             {step === 2 && (
               <>
-                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-1">
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
                   <p className="text-xs text-gray-500 mb-3 font-medium uppercase tracking-wide">Картын мэдээлэл</p>
                   <div className="space-y-3">
                     <div>
                       <label className="block text-xs text-gray-500 mb-1">Картын дугаар</label>
-                      <input
-                        value={form.cardNumber}
-                        onChange={e => set('cardNumber', formatCard(e.target.value))}
-                        placeholder="0000 0000 0000 0000"
-                        className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white tracking-wider"
-                        maxLength={19}
-                      />
+                      <input value={form.cardNumber} onChange={e => set('cardNumber', formatCard(e.target.value))}
+                        placeholder="0000 0000 0000 0000" maxLength={19}
+                        className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white tracking-wider" />
                     </div>
                     <div>
                       <label className="block text-xs text-gray-500 mb-1">Картын нэр</label>
-                      <input
-                        value={form.cardName}
-                        onChange={e => set('cardName', e.target.value.toUpperCase())}
+                      <input value={form.cardName} onChange={e => set('cardName', e.target.value.toUpperCase())}
                         placeholder="CARDHOLDER NAME"
-                        className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white uppercase"
-                      />
+                        className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white uppercase" />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-xs text-gray-500 mb-1">Хүчинтэй хугацаа</label>
-                        <input
-                          value={form.expiry}
-                          onChange={e => set('expiry', formatExpiry(e.target.value))}
-                          placeholder="MM/YY"
-                          maxLength={5}
-                          className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white"
-                        />
+                        <input value={form.expiry} onChange={e => set('expiry', formatExpiry(e.target.value))}
+                          placeholder="MM/YY" maxLength={5}
+                          className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white" />
                       </div>
                       <div>
                         <label className="block text-xs text-gray-500 mb-1">CVV</label>
-                        <input
-                          value={form.cvv}
-                          onChange={e => set('cvv', e.target.value.replace(/\D/g, '').slice(0, 4))}
-                          placeholder="···"
-                          type="password"
-                          maxLength={4}
-                          className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white"
-                        />
+                        <input value={form.cvv} onChange={e => set('cvv', e.target.value.replace(/\D/g, '').slice(0, 4))}
+                          placeholder="···" type="password" maxLength={4}
+                          className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm font-mono focus:outline-none focus:ring-2 focus:ring-amber-300 bg-white" />
                       </div>
                     </div>
                   </div>
@@ -251,6 +386,38 @@ function PaymentModal({ item, onClose, onSuccess }) {
   );
 }
 
+// ── Heart button ───────────────────────────────────────────────
+function HeartButton({ itemId, navigate }) {
+  const { isFavorite, toggleFavorite } = useFavorites();
+  const [animating, setAnimating] = useState(false);
+
+  const handleClick = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) { navigate('/login'); return; }
+    setAnimating(true);
+    await toggleFavorite(itemId);
+    setTimeout(() => setAnimating(false), 300);
+  };
+
+  const fav = isFavorite(itemId);
+
+  return (
+    <button
+      onClick={handleClick}
+      className={`p-2.5 rounded-xl border transition-all ${
+        fav ? 'border-red-200 bg-red-50' : 'border-gray-200 bg-white hover:border-red-200 hover:bg-red-50'
+      } ${animating ? 'scale-110' : 'scale-100'}`}
+      title={fav ? 'Дуртай зүйлсээс хасах' : 'Дуртай зүйлсэд нэмэх'}
+    >
+      <svg className={`w-5 h-5 transition-colors ${fav ? 'text-red-500' : 'text-gray-400'}`}
+        fill={fav ? 'currentColor' : 'none'} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round"
+          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+      </svg>
+    </button>
+  );
+}
+
 // ── Main component ──────────────────────────────────────────────
 function DestinationDetail() {
   const { id } = useParams();
@@ -267,7 +434,6 @@ function DestinationDetail() {
     setCurrentImageIndex(0); setShowModal(false); setBookingDone(false);
     fetchItem();
     window.scrollTo(0, 0);
-    return () => { setItem(null); setCurrentImageIndex(0); };
   }, [id]);
 
   const fetchItem = async () => {
@@ -333,12 +499,10 @@ function DestinationDetail() {
   return (
     <div className="min-h-screen bg-gray-50">
 
-      {/* Payment modal */}
       {showModal && (
         <PaymentModal item={item} onClose={() => setShowModal(false)} onSuccess={handlePaymentSuccess} />
       )}
 
-      {/* Success toast */}
       {bookingDone && (
         <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-emerald-50 border border-emerald-200 text-emerald-800 px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3">
           <svg className="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -362,24 +526,22 @@ function DestinationDetail() {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-8">
-        {/* Category badge */}
-        <div className="mb-4">
+        <div className="mb-4 flex items-center justify-between">
           <span className="inline-block px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-xs font-semibold border border-amber-200">
             {categoryLabel()}
           </span>
+          <HeartButton itemId={item._id} navigate={navigate} />
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Image carousel */}
           <div className="relative h-80 md:h-[460px] bg-gray-100">
             <img src={currentImage} alt={item.title} className="w-full h-full object-cover" />
-
             {item.discount && (
               <span className="absolute top-4 right-4 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow">
                 {item.discount} OFF
               </span>
             )}
-
             {hasImages && item.images.length > 1 && (
               <>
                 <button onClick={prevImage}
@@ -434,13 +596,10 @@ function DestinationDetail() {
                     <p className="text-sm text-gray-500 mt-0.5">{item.duration}</p>
                   )}
                 </div>
-                <button
-                  onClick={handleBookingClick}
-                  disabled={bookingDone}
+                <button onClick={handleBookingClick} disabled={bookingDone}
                   className={`px-8 py-3.5 rounded-xl font-semibold text-sm transition whitespace-nowrap ${
                     bookingDone ? 'bg-emerald-100 text-emerald-700 cursor-default' : 'bg-amber-800 text-white hover:bg-amber-900 shadow-sm'
-                  }`}
-                >
+                  }`}>
                   {bookingDone ? 'Захиалга баталгаажсан' : bookingBtnLabel()}
                 </button>
               </div>
@@ -470,7 +629,6 @@ function DestinationDetail() {
               </div>
             </div>
 
-            {/* Reviews */}
             <ReviewSection itemId={item._id} itemType={item.category} />
           </div>
         </div>

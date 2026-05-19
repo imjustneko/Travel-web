@@ -14,6 +14,8 @@ const reservationRoutes = require('./routes/reservations');
 const reviewRoutes = require('./routes/reviews');
 const subscriptionRoutes = require('./routes/subscription');
 const eventsRoutes = require('./routes/events');
+const favoritesRoutes = require('./routes/favorites');
+const packagesRoutes = require('./routes/packages');
 
 const app = express();
 
@@ -57,6 +59,8 @@ app.use('/api/reservations', reservationRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/events', eventsRoutes);
+app.use('/api/favorites', favoritesRoutes);
+app.use('/api/packages', packagesRoutes);
 
 // Health check
 app.get('/', (req, res) => {

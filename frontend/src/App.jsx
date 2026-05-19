@@ -12,6 +12,8 @@ import Profile from './pages/Profile';
 import AdminDashboard from './pages/AdminDashboard';
 import DestinationDetail from './pages/DestinationDetail';
 import EventsList from './pages/EventsList';
+import Favorites from './pages/Favorites';
+import PackagesList from './pages/PackagesList';
 import LoadingSpinner from './components/ui/LoadingSpinner';
 
 function App() {
@@ -117,6 +119,8 @@ function App() {
           <Route path="/register" element={<Register onLogin={handleLogin} />} />
           <Route path="/destination/:id" element={<DestinationDetail />} />
           <Route path="/events" element={<EventsList />} />
+          <Route path="/packages" element={<PackagesList />} />
+          <Route path="/favorites" element={<Favorites />} />
           <Route
             path="/profile"
             element={

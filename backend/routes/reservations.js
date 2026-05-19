@@ -144,6 +144,27 @@ router.put('/:id/cancel', auth, async (req, res) => {
   }
 });
 
+// @route   GET /api/reservations/availability/:itemId
+// @desc    Get booked date ranges for an item (public)
+// @access  Public
+router.get('/availability/:itemId', async (req, res) => {
+  try {
+    const reservations = await Reservation.find({
+      item: req.params.itemId,
+      status: { $ne: 'cancelled' },
+      checkIn: { $ne: null },
+      checkOut: { $gte: new Date() }
+    }).select('checkIn checkOut');
+
+    res.json({
+      success: true,
+      bookedRanges: reservations.map(r => ({ checkIn: r.checkIn, checkOut: r.checkOut }))
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch availability', error: error.message });
+  }
+});
+
 // @route   DELETE /api/reservations/:id
 // @desc    Delete a reservation (admin only)
 // @access  Admin

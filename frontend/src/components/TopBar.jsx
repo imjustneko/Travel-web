@@ -31,6 +31,7 @@ function TopBar({ isAuthenticated, isAdmin, userName, onLogout }) {
     { label: 'Хоол хүнс',     action: () => scrollTo('dining') },
     { label: 'Үйл ажиллагаа', action: () => scrollTo('activities') },
     { label: 'Арга хэмжээ',   action: () => navigate('/events'), isLink: true, to: '/events' },
+    { label: 'Багцууд',        action: () => navigate('/packages'), isLink: true, to: '/packages' },
     { label: 'Холбоо барих',  action: () => scrollTo('contact') },
   ];
 
@@ -113,6 +114,16 @@ function TopBar({ isAuthenticated, isAdmin, userName, onLogout }) {
                           <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                         </svg>
                         Миний профайл
+                      </Link>
+                      <Link
+                        to="/favorites"
+                        onClick={() => setShowProfileMenu(false)}
+                        className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                      >
+                        <svg className="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                        </svg>
+                        Дуртай зүйлс
                       </Link>
                       {isAdmin && (
                         <Link
