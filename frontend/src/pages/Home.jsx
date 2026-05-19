@@ -647,8 +647,14 @@ function RoomCard({ item, onClick, isComparing, canCompare, onCompareToggle, isF
         <p className="text-gray-500 text-sm mb-4 line-clamp-2 leading-relaxed">{item.description}</p>
         <div className="flex justify-between items-center">
           <div>
-            <span className="text-xl font-bold text-amber-800">{item.price}</span>
-            <span className="text-gray-400 text-xs ml-1">/ шөнөд</span>
+            {item.price === 'Үнэгүй' || !item.price ? (
+              <span className="text-sm font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">Үнэгүй</span>
+            ) : (
+              <>
+                <span className="text-xl font-bold text-amber-800">{item.price}</span>
+                <span className="text-gray-400 text-xs ml-1">/ шөнөд</span>
+              </>
+            )}
           </div>
           <span className="text-amber-800 text-sm font-semibold">Үзэх →</span>
         </div>

@@ -6,23 +6,90 @@ const TOKEN = () => localStorage.getItem('token');
 const AUTH = () => ({ headers: { Authorization: `Bearer ${TOKEN()}` } });
 
 const NAV_ITEMS = [
-  { key: 'overview',      label: 'Тойм' },
-  { key: 'destinations',  label: 'Жагсаалт' },
-  { key: 'reservations',  label: 'Захиалга' },
-  { key: 'users',         label: 'Хэрэглэгчид' },
+  { key: 'overview',     label: 'Тойм' },
+  { key: 'revenue',      label: 'Орлого' },
+  { key: 'destinations', label: 'Жагсаалт' },
+  { key: 'reservations', label: 'Захиалга' },
+  { key: 'users',        label: 'Хэрэглэгчид' },
 ];
+
+// ── SVG Bar Chart ──────────────────────────────────────────────
+function BarChart({ data, labelKey, valueKey, formatVal, color = '#d97706', height = 140 }) {
+  if (!data?.length) return <p className="text-center py-8 text-xs text-gray-400">Өгөгдөл байхгүй</p>;
+  const max = Math.max(...data.map(d => d[valueKey]), 1);
+  const W = 100; // viewBox units per bar
+  const totalW = data.length * W;
+
+  return (
+    <svg viewBox={`0 0 ${totalW} ${height + 28}`} className="w-full" preserveAspectRatio="none">
+      {data.map((d, i) => {
+        const barH = Math.max(3, (d[valueKey] / max) * height);
+        const x = i * W + 8;
+        const barW = W - 16;
+        const y = height - barH;
+        return (
+          <g key={i}>
+            <rect x={x} y={y} width={barW} height={barH} fill={color} rx="3" opacity="0.85" />
+            {d[valueKey] > 0 && (
+              <text x={x + barW / 2} y={y - 3} textAnchor="middle" fontSize="9" fill="#6b7280">
+                {formatVal ? formatVal(d[valueKey]) : d[valueKey]}
+              </text>
+            )}
+            <text x={x + barW / 2} y={height + 16} textAnchor="middle" fontSize="8" fill="#9ca3af">
+              {String(d[labelKey]).slice(5)}
+            </text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+// ── Occupancy bar (horizontal %) ──────────────────────────────
+function OccupancyBars({ data }) {
+  if (!data?.length) return null;
+  const sorted = [...data].sort((a, b) => b.rate - a.rate);
+  return (
+    <div className="space-y-2">
+      {data.map(({ month, rate }) => {
+        const isBusiest = month === sorted[0]?.month;
+        return (
+          <div key={month} className="flex items-center gap-3 text-xs">
+            <span className="w-14 text-right text-gray-400 flex-shrink-0">{month.slice(5)}-р сар</span>
+            <div className="flex-1 h-5 bg-gray-100 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${isBusiest ? 'bg-amber-500' : 'bg-amber-300'}`}
+                style={{ width: `${rate}%` }}
+              />
+            </div>
+            <span className={`w-10 font-semibold flex-shrink-0 ${isBusiest ? 'text-amber-700' : 'text-gray-500'}`}>
+              {rate}%
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Format number ─────────────────────────────────────────────
+const fmtMNT = v => v >= 1000000
+  ? `₮${(v / 1000000).toFixed(1)}M`
+  : v >= 1000 ? `₮${(v / 1000).toFixed(0)}K` : `₮${v}`;
 
 export default function AdminDashboard({ onLogout, userName }) {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
 
   const [stats, setStats] = useState(null);
+  const [revenue, setRevenue] = useState(null);
+  const [occupancy, setOccupancy] = useState(null);
   const [destinations, setDestinations] = useState([]);
   const [users, setUsers] = useState([]);
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [revenueLoading, setRevenueLoading] = useState(false);
 
-  // Destination form
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
@@ -32,6 +99,10 @@ export default function AdminDashboard({ onLogout, userName }) {
   const [imageUrls, setImageUrls] = useState(['']);
 
   useEffect(() => { fetchAll(); }, []);
+
+  useEffect(() => {
+    if (activeTab === 'revenue' && !revenue) fetchRevenue();
+  }, [activeTab]);
 
   const fetchAll = async () => {
     setLoading(true);
@@ -46,33 +117,42 @@ export default function AdminDashboard({ onLogout, userName }) {
       setDestinations(d.data);
       setUsers(u.data);
       setReservations(r.data);
-    } catch (err) {
-      console.error(err);
-    }
+    } catch (err) { console.error(err); }
     setLoading(false);
   };
 
-  // ── Destination ──
-  const handleInput = (e) => {
+  const fetchRevenue = async () => {
+    setRevenueLoading(true);
+    try {
+      const [rev, occ] = await Promise.all([
+        api.get('/api/admin/revenue', AUTH()),
+        api.get('/api/admin/occupancy', AUTH()),
+      ]);
+      setRevenue(rev.data);
+      setOccupancy(occ.data);
+    } catch (err) { console.error(err); }
+    setRevenueLoading(false);
+  };
+
+  const handleInput = e => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
-  const handleSubmitDest = async (e) => {
+  const handleSubmitDest = async e => {
     e.preventDefault();
     const images = imageUrls.filter(u => u.trim());
     const data = { ...formData, images };
     try {
       if (editingId) await api.put(`/api/admin/destinations/${editingId}`, data, AUTH());
       else await api.post('/api/admin/destinations', data, AUTH());
-      resetForm();
-      fetchAll();
+      resetForm(); fetchAll();
     } catch { alert('Хадгалахад алдаа гарлаа'); }
   };
 
-  const handleEditDest = (d) => {
+  const handleEditDest = d => {
     setFormData({
-      title: d.title, description: d.description, price: d.price,
+      title: d.title, description: d.description, price: d.price || '',
       priceValue: d.priceValue != null ? String(d.priceValue) : '',
       location: d.location, duration: d.duration, featured: d.featured,
       discount: d.discount || '', originalPrice: d.originalPrice || '',
@@ -84,93 +164,86 @@ export default function AdminDashboard({ onLogout, userName }) {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleDeleteDest = async (id) => {
+  const handleDeleteDest = async id => {
     if (!window.confirm('Устгах уу?')) return;
     try { await api.delete(`/api/admin/destinations/${id}`, AUTH()); fetchAll(); }
     catch { alert('Устгахад алдаа гарлаа'); }
   };
 
   const resetForm = () => {
-    setFormData({
-      title: '', description: '', price: '', priceValue: '', location: '',
-      duration: '5 days', featured: false, discount: '', originalPrice: '', category: 'room',
-    });
-    setImageUrls(['']);
-    setEditingId(null);
-    setShowForm(false);
+    setFormData({ title: '', description: '', price: '', priceValue: '', location: '', duration: '5 days', featured: false, discount: '', originalPrice: '', category: 'room' });
+    setImageUrls(['']); setEditingId(null); setShowForm(false);
   };
 
-  // ── Users ──
   const handleDeleteUser = async (id, name) => {
     if (!window.confirm(`"${name}" хэрэглэгчийг устгах уу?`)) return;
     try { await api.delete(`/api/admin/users/${id}`, AUTH()); fetchAll(); }
     catch { alert('Устгахад алдаа гарлаа'); }
   };
 
-  // ── Reservations ──
   const handleReservationStatus = async (id, status) => {
     try { await api.put(`/api/admin/reservations/${id}/status`, { status }, AUTH()); fetchAll(); }
     catch { alert('Алдаа гарлаа'); }
   };
 
-  const handleDeleteReservation = async (id) => {
+  const handleDeleteReservation = async id => {
     if (!window.confirm('Захиалгыг устгах уу?')) return;
     try { await api.delete(`/api/admin/reservations/${id}`, AUTH()); fetchAll(); }
     catch { alert('Устгахад алдаа гарлаа'); }
   };
 
-  const statusStyle = (s) => ({
+  const handleExportCSV = async () => {
+    try {
+      const response = await api.get('/api/admin/reservations/export', {
+        ...AUTH(),
+        responseType: 'blob',
+      });
+      const url = URL.createObjectURL(new Blob([response.data]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `reservations-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch { alert('Export амжилтгүй болов'); }
+  };
+
+  const statusStyle = s => ({
     confirmed: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
     pending:   'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
     cancelled: 'bg-red-50 text-red-600 ring-1 ring-red-200',
   }[s] || 'bg-gray-100 text-gray-500');
 
-  const statusLabel = (s) => ({ confirmed: 'Баталгаажсан', pending: 'Хүлээгдэж байна', cancelled: 'Цуцлагдсан' }[s] || s);
-  const fmtDate = (d) => d ? new Date(d).toLocaleDateString('mn-MN') : '—';
+  const statusLabel = s => ({ confirmed: 'Баталгаажсан', pending: 'Хүлээгдэж байна', cancelled: 'Цуцлагдсан' }[s] || s);
+  const fmtDate = d => d ? new Date(d).toLocaleDateString('mn-MN') : '—';
 
   const validPreviews = imageUrls.filter(u => u.trim().startsWith('http'));
-
-  const handleLogoutClick = () => {
-    onLogout();
-    navigate('/');
-  };
 
   return (
     <div className="flex h-screen bg-gray-100 overflow-hidden font-sans">
 
       {/* ── Sidebar ── */}
       <aside className="w-56 flex-shrink-0 bg-gray-900 flex flex-col">
-        {/* Brand */}
         <div className="px-6 py-5 border-b border-gray-800">
           <div className="text-white font-bold text-base leading-tight">Улаан Хад</div>
           <div className="text-gray-500 text-xs mt-0.5">Admin панель</div>
         </div>
-
-        {/* Navigation */}
         <nav className="flex-1 px-3 py-4 space-y-0.5">
           {NAV_ITEMS.map(({ key, label }) => (
-            <button
-              key={key}
-              onClick={() => setActiveTab(key)}
+            <button key={key} onClick={() => setActiveTab(key)}
               className={`w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                activeTab === key
-                  ? 'bg-white text-gray-900'
-                  : 'text-gray-400 hover:text-white hover:bg-gray-800'
-              }`}
-            >
+                activeTab === key ? 'bg-white text-gray-900' : 'text-gray-400 hover:text-white hover:bg-gray-800'
+              }`}>
               {label}
               {key === 'reservations' && reservations.length > 0 && (
                 <span className={`ml-2 text-xs px-1.5 py-0.5 rounded-full font-semibold ${
                   activeTab === key ? 'bg-gray-200 text-gray-700' : 'bg-gray-700 text-gray-300'
-                }`}>
-                  {reservations.length}
-                </span>
+                }`}>{reservations.length}</span>
               )}
             </button>
           ))}
         </nav>
-
-        {/* User + Logout */}
         <div className="px-4 py-4 border-t border-gray-800">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-7 h-7 rounded-full bg-amber-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
@@ -181,10 +254,8 @@ export default function AdminDashboard({ onLogout, userName }) {
               <div className="text-gray-500 text-xs">Администратор</div>
             </div>
           </div>
-          <button
-            onClick={handleLogoutClick}
-            className="w-full text-left text-xs text-gray-500 hover:text-gray-300 transition py-1"
-          >
+          <button onClick={() => { onLogout(); navigate('/'); }}
+            className="w-full text-left text-xs text-gray-500 hover:text-gray-300 transition py-1">
             Гарах
           </button>
         </div>
@@ -192,23 +263,30 @@ export default function AdminDashboard({ onLogout, userName }) {
 
       {/* ── Main ── */}
       <div className="flex-1 flex flex-col overflow-hidden">
-
-        {/* Top bar */}
         <header className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between flex-shrink-0">
-          <div>
-            <h1 className="text-lg font-semibold text-gray-900">
-              {NAV_ITEMS.find(t => t.key === activeTab)?.label}
-            </h1>
+          <h1 className="text-lg font-semibold text-gray-900">
+            {NAV_ITEMS.find(t => t.key === activeTab)?.label}
+          </h1>
+          <div className="flex items-center gap-2">
+            {activeTab === 'reservations' && (
+              <button onClick={handleExportCSV}
+                className="text-sm text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg transition font-medium">
+                CSV татах
+              </button>
+            )}
+            {activeTab === 'revenue' && (
+              <button onClick={fetchRevenue}
+                className="text-sm text-gray-500 hover:text-gray-800 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition">
+                Шинэчлэх
+              </button>
+            )}
+            <button onClick={fetchAll}
+              className="text-sm text-gray-500 hover:text-gray-800 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition">
+              Шинэчлэх
+            </button>
           </div>
-          <button
-            onClick={fetchAll}
-            className="text-sm text-gray-500 hover:text-gray-800 border border-gray-200 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition"
-          >
-            Шинэчлэх
-          </button>
         </header>
 
-        {/* Content */}
         <main className="flex-1 overflow-y-auto px-8 py-6">
           {loading ? (
             <div className="flex items-center justify-center h-64 text-gray-400 text-sm">Уншиж байна...</div>
@@ -234,8 +312,12 @@ export default function AdminDashboard({ onLogout, userName }) {
                   </div>
 
                   <div className="bg-white rounded-xl border border-gray-200">
-                    <div className="px-5 py-4 border-b border-gray-100">
+                    <div className="px-5 py-4 border-b border-gray-100 flex justify-between items-center">
                       <h2 className="text-sm font-semibold text-gray-800">Сүүлийн захиалгууд</h2>
+                      <button onClick={handleExportCSV}
+                        className="text-xs text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1 rounded-lg transition">
+                        CSV татах
+                      </button>
                     </div>
                     {reservations.length === 0 ? (
                       <div className="px-5 py-8 text-center text-sm text-gray-400">Захиалга байхгүй</div>
@@ -253,7 +335,7 @@ export default function AdminDashboard({ onLogout, userName }) {
                               </div>
                             </div>
                             <div className="flex items-center gap-4 text-sm">
-                              <span className="font-medium text-gray-700">{r.itemDetails?.price || r.item?.price || '—'}</span>
+                              <span className="font-medium text-gray-700">{r.payment?.amount || r.itemDetails?.price || '—'}</span>
                               <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusStyle(r.status)}`}>{statusLabel(r.status)}</span>
                               <span className="text-xs text-gray-400">{fmtDate(r.createdAt)}</span>
                             </div>
@@ -272,15 +354,106 @@ export default function AdminDashboard({ onLogout, userName }) {
                 </div>
               )}
 
+              {/* ── REVENUE ── */}
+              {activeTab === 'revenue' && (
+                <div className="space-y-5">
+                  {revenueLoading ? (
+                    <div className="flex items-center justify-center h-64 text-gray-400 text-sm">Уншиж байна...</div>
+                  ) : revenue ? (
+                    <>
+                      {/* KPI Cards */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {[
+                          { label: 'Нийт орлого', value: fmtMNT(revenue.totalRevenue), sub: 'Бүх цаг', color: 'text-emerald-700' },
+                          { label: 'Энэ сарын орлого', value: fmtMNT(revenue.thisMonth), sub: 'Поток', color: 'text-amber-700' },
+                          { label: 'Өмнөх сар', value: fmtMNT(revenue.lastMonth), sub: 'Харьцуулалт', color: 'text-gray-700' },
+                          { label: 'Тооцоо хийгдсэн', value: revenue.paidCount, sub: 'захиалга', color: 'text-gray-700' },
+                        ].map(({ label, value, sub, color }) => (
+                          <div key={label} className="bg-white rounded-xl border border-gray-200 p-5">
+                            <div className={`text-2xl font-bold ${color}`}>{value}</div>
+                            <div className="text-sm font-medium text-gray-700 mt-1">{label}</div>
+                            <div className="text-xs text-gray-400 mt-0.5">{sub}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Monthly Revenue Chart */}
+                      <div className="bg-white rounded-xl border border-gray-200 p-5">
+                        <h2 className="text-sm font-semibold text-gray-800 mb-4">Сарын орлого (сүүлийн 12 сар)</h2>
+                        <BarChart
+                          data={revenue.monthly}
+                          labelKey="month"
+                          valueKey="revenue"
+                          formatVal={fmtMNT}
+                          color="#d97706"
+                        />
+                      </div>
+
+                      {/* Top Items + Occupancy */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        {/* Top booked items */}
+                        <div className="bg-white rounded-xl border border-gray-200 p-5">
+                          <h2 className="text-sm font-semibold text-gray-800 mb-4">Хамгийн их захиалагдсан</h2>
+                          <div className="space-y-3">
+                            {revenue.topItems.map((item, i) => (
+                              <div key={item.title} className="flex items-center gap-3">
+                                <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
+                                  i === 0 ? 'bg-amber-100 text-amber-700' :
+                                  i === 1 ? 'bg-gray-100 text-gray-600' :
+                                  i === 2 ? 'bg-orange-50 text-orange-600' : 'bg-gray-50 text-gray-400'
+                                }`}>{i + 1}</span>
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium text-gray-800 truncate">{item.title}</p>
+                                  <p className="text-xs text-gray-400">{item.count} захиалга</p>
+                                </div>
+                                <span className="text-sm font-semibold text-amber-700 flex-shrink-0">{fmtMNT(item.revenue)}</span>
+                              </div>
+                            ))}
+                            {revenue.topItems.length === 0 && (
+                              <p className="text-xs text-gray-400 text-center py-4">Өгөгдөл байхгүй</p>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Occupancy */}
+                        <div className="bg-white rounded-xl border border-gray-200 p-5">
+                          <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-sm font-semibold text-gray-800">Өрөөний дүүргэлт</h2>
+                            {occupancy?.busiest && (
+                              <span className="text-xs bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full font-medium">
+                                Хамгийн их: {occupancy.busiest.month.slice(5)}-р сар ({occupancy.busiest.rate}%)
+                              </span>
+                            )}
+                          </div>
+                          {occupancy ? (
+                            <OccupancyBars data={occupancy.occupancy} />
+                          ) : (
+                            <p className="text-xs text-gray-400 text-center py-4">Уншиж байна...</p>
+                          )}
+                          {occupancy?.roomCount > 0 && (
+                            <p className="text-xs text-gray-400 mt-3">{occupancy.roomCount} өрөөний тооцоо</p>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-center py-20">
+                      <p className="text-gray-400 text-sm mb-3">Өгөгдөл ачааллаагүй байна</p>
+                      <button onClick={fetchRevenue} className="text-sm text-amber-700 border border-amber-200 px-4 py-2 rounded-lg hover:bg-amber-50 transition">
+                        Дахин оролдох
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* ── DESTINATIONS ── */}
               {activeTab === 'destinations' && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-gray-500">{destinations.length} жагсаалт</p>
-                    <button
-                      onClick={() => { setShowForm(!showForm); if (showForm) resetForm(); }}
-                      className="bg-gray-900 text-white text-sm px-4 py-2 rounded-lg hover:bg-gray-800 transition font-medium"
-                    >
+                    <button onClick={() => { setShowForm(!showForm); if (showForm) resetForm(); }}
+                      className="bg-gray-900 text-white text-sm px-4 py-2 rounded-lg hover:bg-gray-800 transition font-medium">
                       {showForm ? 'Хаах' : '+ Нэмэх'}
                     </button>
                   </div>
@@ -301,9 +474,12 @@ export default function AdminDashboard({ onLogout, userName }) {
                           className="border border-gray-200 px-3 py-2 rounded-lg text-sm w-full focus:outline-none focus:ring-2 focus:ring-gray-300 resize-none" />
                         <div className="grid grid-cols-4 gap-3">
                           <div>
-                            <input name="price" value={formData.price} onChange={handleInput} placeholder="Үнэ (жнэ: ₮100,000)"
+                            <input name="price" value={formData.price} onChange={handleInput}
+                              placeholder="₮100,000 эсвэл хоосон"
                               className="border border-gray-200 px-3 py-2 rounded-lg text-sm w-full focus:outline-none focus:ring-2 focus:ring-gray-300" />
-                            <p className="text-xs text-gray-400 mt-0.5 px-1">Харуулах үнэ</p>
+                            <p className="text-xs text-gray-400 mt-0.5 px-1">
+                              Хоосон үлдээвэл <span className="text-emerald-600 font-medium">«Үнэгүй»</span> харагдана
+                            </p>
                           </div>
                           <div>
                             <input name="priceValue" type="number" min="0" value={formData.priceValue} onChange={handleInput}
@@ -328,8 +504,6 @@ export default function AdminDashboard({ onLogout, userName }) {
                               <span>1 шөнө = ₮{Number(formData.priceValue).toLocaleString()}</span>
                               <span className="text-amber-400">·</span>
                               <span>3 шөнө = ₮{(Number(formData.priceValue) * 3).toLocaleString()}</span>
-                              <span className="text-amber-400">·</span>
-                              <span>7 шөнө = ₮{(Number(formData.priceValue) * 7).toLocaleString()}</span>
                             </div>
                           )}
                         </div>
@@ -414,13 +588,17 @@ export default function AdminDashboard({ onLogout, userName }) {
                               {d.images?.[0] ? (
                                 <img src={d.images[0]} alt="" className="w-12 h-9 object-cover rounded-lg"
                                   onError={e => { e.target.src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=80'; }} />
-                              ) : (
-                                <div className="w-12 h-9 bg-gray-100 rounded-lg" />
-                              )}
+                              ) : <div className="w-12 h-9 bg-gray-100 rounded-lg" />}
                             </td>
                             <td className="px-4 py-3 font-medium text-gray-900">{d.title}</td>
                             <td className="px-4 py-3 text-gray-500 capitalize">{d.category}</td>
-                            <td className="px-4 py-3 text-gray-700 font-medium">{d.price}</td>
+                            <td className="px-4 py-3">
+                              {d.price === 'Үнэгүй' || !d.price ? (
+                                <span className="text-xs bg-emerald-50 text-emerald-700 font-semibold px-2 py-0.5 rounded-full border border-emerald-200">Үнэгүй</span>
+                              ) : (
+                                <span className="text-gray-700 font-medium">{d.price}</span>
+                              )}
+                            </td>
                             <td className="px-4 py-3">
                               <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-medium">
                                 {d.images?.length || 0}
@@ -452,35 +630,47 @@ export default function AdminDashboard({ onLogout, userName }) {
               {/* ── RESERVATIONS ── */}
               {activeTab === 'reservations' && (
                 <div className="space-y-4">
-                  <p className="text-sm text-gray-500">{reservations.length} захиалга</p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm text-gray-500">{reservations.length} захиалга</p>
+                    <button onClick={handleExportCSV}
+                      className="text-sm text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg transition font-medium flex items-center gap-1.5">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                      </svg>
+                      Excel/CSV татах
+                    </button>
+                  </div>
                   <div className="bg-white rounded-xl border border-gray-200 overflow-x-auto">
                     <table className="w-full text-sm min-w-[720px]">
                       <thead>
                         <tr className="border-b border-gray-100 bg-gray-50">
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Хэрэглэгч</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Захиалсан зүйл</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Үнэ</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Зочид</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Төлөв</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Огноо</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Үйлдэл</th>
+                          {['Хэрэглэгч', 'Захиалсан зүйл', 'Дүн', 'Зочид', 'Орох/Гарах', 'Төлөв', 'Огноо', 'Үйлдэл'].map(h => (
+                            <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>
+                          ))}
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50">
                         {reservations.map(r => (
                           <tr key={r._id} className="hover:bg-gray-50 transition">
                             <td className="px-4 py-3">
-                              <div>
-                                <p className="font-medium text-gray-900">{r.user?.name || 'Устгагдсан'}</p>
-                                <p className="text-xs text-gray-400 mt-0.5">{r.user?.email || '—'}</p>
-                              </div>
+                              <p className="font-medium text-gray-900">{r.user?.name || 'Устгагдсан'}</p>
+                              <p className="text-xs text-gray-400 mt-0.5">{r.user?.email || '—'}</p>
                             </td>
                             <td className="px-4 py-3">
                               <p className="font-medium text-gray-800">{r.itemDetails?.title || r.item?.title || '—'}</p>
                               <p className="text-xs text-gray-400 capitalize mt-0.5">{r.itemDetails?.category || r.item?.category || '—'}</p>
                             </td>
-                            <td className="px-4 py-3 font-semibold text-gray-800">{r.itemDetails?.price || r.item?.price || '—'}</td>
+                            <td className="px-4 py-3 font-semibold text-gray-800">
+                              {r.payment?.amount || r.itemDetails?.price || '—'}
+                              {r.payment?.status === 'paid' && (
+                                <span className="ml-1 text-xs text-emerald-600">✓</span>
+                              )}
+                            </td>
                             <td className="px-4 py-3 text-gray-500">{r.guests || 1}</td>
+                            <td className="px-4 py-3 text-xs text-gray-500">
+                              {r.checkIn ? fmtDate(r.checkIn) : '—'}
+                              {r.checkOut && <><br />{fmtDate(r.checkOut)}</>}
+                            </td>
                             <td className="px-4 py-3">
                               <select value={r.status} onChange={e => handleReservationStatus(r._id, e.target.value)}
                                 className={`text-xs font-medium px-2.5 py-1 rounded-full border-0 outline-none cursor-pointer ${statusStyle(r.status)}`}>
@@ -515,12 +705,9 @@ export default function AdminDashboard({ onLogout, userName }) {
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-gray-100 bg-gray-50">
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Нэр</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Имэйл</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Төрөл</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Эрх</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Бүртгэгдсэн</th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Үйлдэл</th>
+                          {['Нэр', 'Имэйл', 'Төрөл', 'Эрх', 'Бүртгэгдсэн', 'Үйлдэл'].map(h => (
+                            <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">{h}</th>
+                          ))}
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-50">
@@ -547,9 +734,7 @@ export default function AdminDashboard({ onLogout, userName }) {
                             <td className="px-4 py-3">
                               {u.isAdmin ? (
                                 <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-red-50 text-red-600 ring-1 ring-red-200">Admin</span>
-                              ) : (
-                                <span className="text-xs text-gray-400">—</span>
-                              )}
+                              ) : <span className="text-xs text-gray-400">—</span>}
                             </td>
                             <td className="px-4 py-3 text-gray-400 text-xs">{fmtDate(u.createdAt)}</td>
                             <td className="px-4 py-3">
