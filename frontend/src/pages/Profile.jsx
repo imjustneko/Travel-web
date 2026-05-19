@@ -64,7 +64,7 @@ const handleUpgrade = async () => {
     );
     fetchSubscription();
     fetchProfile();
-    setSuccess('🎉 Пүрэмиум болгох амжилттай боллоо!');
+    setSuccess('🎉 Премиүм болгох амжилттай боллоо!');
     setTimeout(() => setSuccess(''), 3000);
   } catch (error) {
     setError(error.response?.data?.message || 'Дэвшүүлэхэд алдаа гарлаа');
@@ -333,7 +333,7 @@ const handleDowngrade = async () => {
                         onClick={handleUpgrade}
                         className="bg-amber-800 text-white px-6 py-2 rounded-lg hover:bg-amber-900 transition font-semibold"
                       >
-                        🚀 Пүрэмиум болгох
+                        🚀 Премиүм болгох
                       </button>
                     ) : (
                       <button
