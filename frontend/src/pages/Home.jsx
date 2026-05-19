@@ -24,7 +24,7 @@ function RoomCompareModal({ rooms, onClose, onBook }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden max-h-[95vh] sm:max-h-[90vh] flex flex-col mx-2 sm:mx-4">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
           <h2 className="text-lg font-bold text-gray-900">Өрөө харьцуулах</h2>
           <button onClick={onClose} className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center transition">
@@ -546,21 +546,20 @@ function Home() {
       {/* ── Compare floating bar ── */}
       {compareIds.length > 0 && (
         <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 shadow-2xl">
-          <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
-            <div className="flex-1 flex flex-wrap gap-2">
+          <div className="max-w-7xl mx-auto px-3 md:px-4 py-2.5 md:py-3 flex items-center gap-2 md:gap-3">
+            <div className="flex-1 flex gap-2 overflow-x-auto scrollbar-hide min-w-0">
               {compareIds.map(id => {
                 const room = rooms.find(r => r._id === id);
                 return room ? (
-                  <div key={id} className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-1.5">
-                    <span className="text-sm font-medium text-gray-800 max-w-[120px] truncate">{room.title}</span>
-                    <span className="text-xs font-bold text-amber-800">{room.price}</span>
+                  <div key={id} className="flex items-center gap-1.5 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 flex-shrink-0">
+                    <span className="text-xs font-medium text-gray-800 max-w-[90px] sm:max-w-[120px] truncate">{room.title}</span>
                     <button onClick={() => toggleCompare(id)}
-                      className="text-gray-400 hover:text-red-500 transition ml-1 text-xs font-bold">✕</button>
+                      className="text-gray-400 hover:text-red-500 transition text-xs font-bold flex-shrink-0">✕</button>
                   </div>
                 ) : null;
               })}
               {compareIds.length < 3 && (
-                <div className="flex items-center border-2 border-dashed border-gray-200 rounded-lg px-3 py-1.5 text-gray-400 text-xs">
+                <div className="hidden sm:flex items-center border-2 border-dashed border-gray-200 rounded-lg px-3 py-1.5 text-gray-400 text-xs flex-shrink-0">
                   + Өрөө нэмэх
                 </div>
               )}
@@ -568,11 +567,11 @@ function Home() {
             <button
               onClick={() => setShowCompare(true)}
               disabled={compareIds.length < 2}
-              className="px-5 py-2.5 bg-amber-800 text-white rounded-xl text-sm font-semibold hover:bg-amber-900 transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex-shrink-0">
-              Харьцуулах ({compareIds.length}/3)
+              className="px-3 md:px-5 py-2 md:py-2.5 bg-amber-800 text-white rounded-xl text-xs md:text-sm font-semibold hover:bg-amber-900 transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap flex-shrink-0">
+              <span className="hidden sm:inline">Харьцуулах </span>({compareIds.length}/3)
             </button>
             <button onClick={() => setCompareIds([])}
-              className="text-gray-400 hover:text-gray-600 text-sm p-2 flex-shrink-0">✕</button>
+              className="text-gray-400 hover:text-gray-600 p-1.5 flex-shrink-0 text-sm">✕</button>
           </div>
         </div>
       )}

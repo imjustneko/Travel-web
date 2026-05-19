@@ -317,9 +317,9 @@ function Profile({ userName, setUserName }) {
                   ? getImageUrl(r.itemDetails.image)
                   : null;
                 return (
-                  <div key={r._id} className="flex gap-4 border border-gray-100 rounded-xl p-4 hover:bg-gray-50 transition">
+                  <div key={r._id} className="flex gap-3 md:gap-4 border border-gray-100 rounded-xl p-3 md:p-4 hover:bg-gray-50 transition">
                     {/* Thumbnail */}
-                    <div className="w-24 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                    <div className="w-16 h-16 sm:w-24 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
                       {imgSrc ? (
                         <img src={imgSrc} alt={r.itemDetails?.title} className="w-full h-full object-cover" />
                       ) : (
@@ -345,7 +345,7 @@ function Profile({ userName, setUserName }) {
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-xs text-gray-500">
                         <span className="font-semibold text-amber-800">{r.itemDetails?.price || '—'}</span>
                         {r.checkIn && <span>Орох: {fmtDate(r.checkIn)}</span>}
                         {r.checkOut && <span>Гарах: {fmtDate(r.checkOut)}</span>}

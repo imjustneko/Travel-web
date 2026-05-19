@@ -130,7 +130,7 @@ function InquireModal({ pkg, onClose }) {
         </div>
 
         <form onSubmit={handleSubmit} className="overflow-y-auto flex-1 px-6 py-5 space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Нэр *</label>
               <input value={form.name} onChange={e => set('name', e.target.value)} required placeholder="Таны нэр"
@@ -147,7 +147,7 @@ function InquireModal({ pkg, onClose }) {
             <input type="email" value={form.email} onChange={e => set('email', e.target.value)} required placeholder="email@example.com"
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-300" />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">Зочдын тоо</label>
               <select value={form.guests} onChange={e => set('guests', e.target.value)}

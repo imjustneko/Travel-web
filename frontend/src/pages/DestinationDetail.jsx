@@ -124,7 +124,7 @@ function BookingCalendar({ bookedRanges, checkIn, checkOut, onChange }) {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 px-4 py-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-4 py-3">
         {renderMonth(baseMonth)}
         {renderMonth(month2)}
       </div>
@@ -229,7 +229,7 @@ function PaymentModal({ item, onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+      <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl overflow-hidden max-h-[95vh] sm:max-h-[92vh] flex flex-col mx-2 sm:mx-4">
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
@@ -266,7 +266,7 @@ function PaymentModal({ item, onClose, onSuccess }) {
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
+          <form onSubmit={handleSubmit} className="px-4 sm:px-6 py-4 sm:py-5 space-y-4">
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-2.5 rounded-lg">{error}</div>
             )}
