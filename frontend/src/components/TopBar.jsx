@@ -63,7 +63,7 @@ function TopBar({ isAuthenticated, isAdmin, userName, onLogout, onSearch }) {
             </div>
             <div>
               <div className="text-lg md:text-xl font-bold text-amber-900 leading-tight">Улаан Хад Ресорт</div>
-              <div className="text-xs text-gray-500 hidden md:block tracking-wide">Байгалийн тэвэрт тансаг амралт</div>
+              <div className="text-xs text-gray-500 hidden md:block tracking-wide">Байгалийн цэвэр агаарт тансаг амралт</div>
             </div>
           </Link>
 

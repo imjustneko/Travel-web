@@ -45,7 +45,7 @@ function Login({ onLogin }) {
           <span className="text-4xl">🏔️</span>
           <div>
             <div className="text-xl font-bold text-white">Улаан Хад Ресорт</div>
-            <div className="text-xs text-amber-200">Байгалийн тэвэрт тансаг амралт</div>
+            <div className="text-xs text-amber-200">Байгалийн цэвэр агаарт тансаг амралт</div>
           </div>
         </div>
 
