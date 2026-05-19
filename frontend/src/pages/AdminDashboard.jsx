@@ -316,6 +316,7 @@ export default function AdminDashboard({ onLogout, userName }) {
                             <option value="activity">Үйл ажиллагаа</option>
                             <option value="event">Арга хэмжээ</option>
                             <option value="offer">Тусгай санал</option>
+                            <option value="gallery">Галерей (байгаль)</option>
                           </select>
                           <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
                             <input type="checkbox" name="featured" checked={formData.featured} onChange={handleInput}

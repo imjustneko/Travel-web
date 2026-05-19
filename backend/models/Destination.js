@@ -48,7 +48,7 @@ const destinationSchema = new mongoose.Schema({
   // ⭐ ADD THIS NEW FIELD ⭐
   category: {
     type: String,
-    enum: ['room', 'dining', 'activity', 'event', 'offer'],
+    enum: ['room', 'dining', 'activity', 'event', 'offer', 'gallery'],
     default: 'room'
   },
   // ⭐ END OF NEW FIELD ⭐

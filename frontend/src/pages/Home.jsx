@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api, { getImageUrl } from '../api';
+import GallerySlider from '../components/GallerySlider';
 
 const CATEGORIES = [
   { value: 'all',      label: 'Бүгд' },
@@ -93,6 +94,12 @@ function Home() {
   const activities = by('activity');
   const events     = by('event');
   const offers     = by('offer');
+
+  // Collect all images from gallery items into a flat array
+  const galleryImages = items
+    .filter(i => i.category === 'gallery')
+    .flatMap(i => i.images || [])
+    .filter(Boolean);
 
   const sectionClass = 'scroll-mt-20';
 
@@ -234,6 +241,24 @@ function Home() {
           </div>
         </div>
       </section>
+
+      {/* ── Gallery ── */}
+      {galleryImages.length > 0 && (
+        <section id="gallery" className={`bg-gray-900 ${sectionClass}`}>
+          <div className="max-w-7xl mx-auto px-4 md:px-6 pt-14 pb-8 text-center">
+            <span className="inline-block text-amber-400 font-semibold text-xs uppercase tracking-widest mb-3 bg-amber-900/40 px-4 py-1 rounded-full border border-amber-800/50">
+              Байгалийн гоо үзэсгэлэн
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">Горхи-Тэрэлжийн мэдрэмж</h2>
+            <div className="w-10 h-0.5 bg-amber-700 mx-auto mb-2" />
+            <p className="text-gray-400 text-sm mb-8 max-w-lg mx-auto">
+              Зургийг чирч эсвэл сумыг дарж байгалийн гайхалтай орчныг үзэж болно
+            </p>
+          </div>
+          <GallerySlider images={galleryImages} />
+          <div className="pb-14" />
+        </section>
+      )}
 
       {/* ── Rooms ── */}
       <section id="rooms" className={`py-20 bg-gray-50 ${sectionClass}`}>
