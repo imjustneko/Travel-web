@@ -9,7 +9,7 @@ const auth = require('../middleware/auth');
 // @access  Protected (requires login)
 router.post('/', auth, async (req, res) => {
   try {
-    const { itemId, checkIn, checkOut, guests, notes } = req.body;
+    const { itemId, checkIn, checkOut, guests, notes, payment } = req.body;
 
     // Validate itemId
     if (!itemId) {
@@ -37,7 +37,8 @@ router.post('/', auth, async (req, res) => {
       checkOut: checkOut || null,
       guests: guests || 1,
       notes: notes || '',
-      status: 'confirmed'
+      status: 'confirmed',
+      payment: payment || { status: 'pending' }
     });
 
     await reservation.save();

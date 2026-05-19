@@ -1,550 +1,395 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api from '../api';
+import api, { getImageUrl } from '../api';
 
 function Profile({ userName, setUserName }) {
   const [profile, setProfile] = useState(null);
   const [reservations, setReservations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [editing, setEditing] = useState(false);
   const [success, setSuccess] = useState('');
+  const [editing, setEditing] = useState(false);
   const [subscription, setSubscription] = useState(null);
-  const [subscriptionLoading, setSubscriptionLoading] = useState(true);
-  const navigate = useNavigate();
-  
   const [formData, setFormData] = useState({
-    name: '',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
+    name: '', currentPassword: '', newPassword: '', confirmPassword: ''
   });
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchProfile();
-    fetchReservations();
-    fetchSubscription();
+    fetchAll();
   }, []);
 
-  const fetchProfile = async () => {
+  const fetchAll = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) { navigate('/login'); return; }
     try {
-      const token = localStorage.getItem('token');
-      const response = await api.get('/api/user/profile', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setProfile(response.data);
-      setFormData({ ...formData, name: response.data.name });
-      setLoading(false);
-    } catch (error) {
+      const [profileRes, resRes, subRes] = await Promise.all([
+        api.get('/api/user/profile', { headers: { Authorization: `Bearer ${token}` } }),
+        api.get('/api/reservations/my', { headers: { Authorization: `Bearer ${token}` } }),
+        api.get('/api/subscription/status', { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: null })),
+      ]);
+      setProfile(profileRes.data);
+      setFormData(f => ({ ...f, name: profileRes.data.name }));
+      setReservations(resRes.data.reservations || []);
+      setSubscription(subRes.data);
+    } catch (err) {
       setError('Профайл ачааллахад алдаа гарлаа');
+    } finally {
       setLoading(false);
     }
-  };
-  const fetchSubscription = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await api.get('/api/subscription/status', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    setSubscription(response.data);
-    setSubscriptionLoading(false);
-  } catch (error) {
-    console.error('Failed to fetch subscription:', error);
-    setSubscriptionLoading(false);
-  }
-};
-
-const handleUpgrade = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    await api.put(
-      '/api/subscription/upgrade',
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    fetchSubscription();
-    fetchProfile();
-    setSuccess('🎉 Премиүм болгох амжилттай боллоо!');
-    setTimeout(() => setSuccess(''), 3000);
-  } catch (error) {
-    setError(error.response?.data?.message || 'Дэвшүүлэхэд алдаа гарлаа');
-  }
-};
-
-const handleDowngrade = async () => {
-  if (!window.confirm('Та пүрэмиум гишүүнчлэлээ цуцлахдаа итгэлтэй байна уу?')) {
-    return;
-  }
-
-  try {
-    const token = localStorage.getItem('token');
-    await api.put(
-      '/api/subscription/downgrade',
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-    fetchSubscription();
-    fetchProfile();
-    setSuccess('Зочны данс руу буулгагдлаа');
-    setTimeout(() => setSuccess(''), 3000);
-  } catch (error) {
-    setError(error.response?.data?.message || 'Буулгахад алдаа гарлаа');
-  }
-};
-
-  const fetchReservations = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await api.get('/api/reservations/my', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setReservations(response.data.reservations || []);
-    } catch (error) {
-      console.error('Failed to fetch reservations:', error);
-    }
-  };
-
-  const handleCancelReservation = async (reservationId) => {
-    if (!window.confirm('Та энэ захиалгыг цуцлахдаа итгэлтэй байна уу?')) {
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem('token');
-      await api.put(
-        `/api/reservations/${reservationId}/cancel`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      
-      // Refresh reservations
-      fetchReservations();
-      setSuccess('Захиалга амжилттай цуцлагдлаа');
-      setTimeout(() => setSuccess(''), 3000);
-    } catch (error) {
-      setError('Захиалгыг цуцлахад алдаа гарлаа');
-    }
-  };
-
-  const handleViewRoom = (itemId) => {
-    navigate(`/destination/${itemId}`);
   };
 
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData(f => ({ ...f, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-
+    setError(''); setSuccess('');
     if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
-      setError('Шинэ нууц үгнүүд таарахгүй байна');
-      return;
+      setError('Шинэ нууц үгнүүд таарахгүй байна'); return;
     }
-
     try {
       const token = localStorage.getItem('token');
       const updateData = { name: formData.name };
-
       if (formData.newPassword) {
         updateData.currentPassword = formData.currentPassword;
         updateData.newPassword = formData.newPassword;
       }
-
-      const response = await api.put(
-        '/api/user/profile',
-        updateData,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
+      const res = await api.put('/api/user/profile', updateData, { headers: { Authorization: `Bearer ${token}` } });
       const user = JSON.parse(localStorage.getItem('user') || '{}');
-      user.name = response.data.user.name;
+      user.name = res.data.user.name;
       localStorage.setItem('user', JSON.stringify(user));
-      setUserName(response.data.user.name);
-      setProfile({ ...profile, name: response.data.user.name });
-      
-      setFormData({
-        name: response.data.user.name,
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      });
-
-      setSuccess('Профайл амжилттай шинэчлэгдлаа!');
+      setUserName(res.data.user.name);
+      setProfile(p => ({ ...p, name: res.data.user.name }));
+      setFormData(f => ({ ...f, name: res.data.user.name, currentPassword: '', newPassword: '', confirmPassword: '' }));
+      setSuccess('Профайл амжилттай шинэчлэгдлаа');
       setEditing(false);
       setTimeout(() => setSuccess(''), 3000);
-    } catch (error) {
-      setError(error.response?.data?.message || 'Профайл шинэчлэхэд алдаа гарлаа');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Профайл шинэчлэхэд алдаа гарлаа');
     }
   };
 
-  const cancelEdit = () => {
-    setFormData({
-      name: profile.name,
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    });
-    setEditing(false);
-    setError('');
+  const handleCancelReservation = async (id) => {
+    if (!window.confirm('Захиалгыг цуцлах уу?')) return;
+    try {
+      const token = localStorage.getItem('token');
+      await api.put(`/api/reservations/${id}/cancel`, {}, { headers: { Authorization: `Bearer ${token}` } });
+      fetchAll();
+      setSuccess('Захиалга цуцлагдлаа');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch { setError('Цуцлахад алдаа гарлаа'); }
   };
 
-  const getStatusBadge = (status) => {
-    const badges = {
-      confirmed: 'bg-green-100 text-green-800',
-      pending: 'bg-yellow-100 text-yellow-800',
-      cancelled: 'bg-red-100 text-red-800'
-    };
-    return badges[status] || badges.confirmed;
+  const handleUpgrade = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await api.put('/api/subscription/upgrade', {}, { headers: { Authorization: `Bearer ${token}` } });
+      fetchAll();
+      setSuccess('Premium болгох амжилттай боллоо!');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) { setError(err.response?.data?.message || 'Алдаа гарлаа'); }
   };
+
+  const handleDowngrade = async () => {
+    if (!window.confirm('Premium гишүүнчлэлээ цуцлах уу?')) return;
+    try {
+      const token = localStorage.getItem('token');
+      await api.put('/api/subscription/downgrade', {}, { headers: { Authorization: `Bearer ${token}` } });
+      fetchAll();
+      setSuccess('Зочны данс руу буулгагдлаа');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) { setError(err.response?.data?.message || 'Алдаа гарлаа'); }
+  };
+
+  const statusStyle = (s) => ({
+    confirmed: 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200',
+    pending:   'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
+    cancelled: 'bg-red-50 text-red-600 ring-1 ring-red-200',
+  }[s] || 'bg-gray-100 text-gray-500');
+
+  const statusLabel = (s) => ({ confirmed: 'Баталгаажсан', pending: 'Хүлээгдэж байна', cancelled: 'Цуцлагдсан' }[s] || s);
+  const fmtDate = (d) => d ? new Date(d).toLocaleDateString('mn-MN') : '—';
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-2xl text-amber-800">Уншиж байна...</div>
+      <div className="flex justify-center items-center min-h-screen bg-gray-50">
+        <p className="text-gray-500 text-sm">Уншиж байна...</p>
       </div>
     );
   }
 
-  if (error && !profile) {
+  if (!profile) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="text-2xl text-red-600">{error}</div>
+      <div className="flex flex-col justify-center items-center min-h-screen bg-gray-50 gap-4">
+        <p className="text-red-500 text-sm">{error || 'Профайл олдсонгүй'}</p>
+        <button onClick={() => navigate('/')} className="text-sm text-amber-800 underline">Нүүр хуудас</button>
       </div>
     );
   }
+
+  const confirmedCount = reservations.filter(r => r.status === 'confirmed').length;
+  const isPremium = subscription?.accountType === 'premium';
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12">
-      {/* Success Message */}
-      {success && (
-        <div className="mb-6 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-          {success}
-        </div>
-      )}
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-5xl mx-auto px-4 py-10 space-y-6">
 
-      {/* Profile Information Card */}
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
-        <div className="bg-gradient-to-r from-amber-800 to-amber-900 h-32"></div>
-        
-        <div className="relative px-6 pb-6">
-          <div className="absolute -top-16 left-6">
-            <div className="w-32 h-32 bg-white rounded-full border-4 border-white shadow-lg flex items-center justify-center">
-              <span className="text-5xl text-amber-800 font-bold">
-                {profile?.name?.charAt(0).toUpperCase()}
+        {/* Toast messages */}
+        {success && (
+          <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-emerald-50 border border-emerald-200 text-emerald-800 px-5 py-3 rounded-xl shadow-lg text-sm font-medium">
+            {success}
+          </div>
+        )}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
+            {error}
+          </div>
+        )}
+
+        {/* ── Profile card ── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+          {/* Cover */}
+          <div className="h-28 bg-gradient-to-r from-amber-800 to-amber-900" />
+
+          <div className="px-6 pb-6 relative">
+            {/* Avatar */}
+            <div className="absolute -top-10 left-6 w-20 h-20 rounded-2xl border-4 border-white shadow-md bg-amber-800 flex items-center justify-center">
+              <span className="text-3xl font-bold text-white">
+                {profile.name?.charAt(0)?.toUpperCase()}
               </span>
             </div>
-          </div>
 
-          <div className="pt-20 flex justify-end">
-            {!editing && (
-              <button
-                onClick={() => setEditing(true)}
-                className="bg-amber-800 text-white px-6 py-2 rounded-lg hover:bg-amber-900 transition"
-              >
-                ✏️ Профайл засах
-              </button>
-            )}
-          </div>
-
-          {!editing ? (
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{profile?.name}</h1>
-              <p className="text-gray-600 mb-6">{profile?.email}</p>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                <div className="bg-amber-50 rounded-lg p-4">
-                  <div className="text-3xl font-bold text-amber-800">{reservations.filter(r => r.status === 'confirmed').length}</div>
-                  <div className="text-gray-600">Идэвхтэй захиалгууд</div>
-                </div>
-                <div className="bg-green-50 rounded-lg p-4">
-                  <div className="text-3xl font-bold text-green-600">{reservations.length}</div>
-                  <div className="text-gray-600">Нийт захиалгууд</div>
-                </div>
-                <div className="bg-purple-50 rounded-lg p-4">
-                  <div className="text-3xl font-bold text-purple-600">
-                    {subscription?.accountType === 'premium' ? '⭐ Пүрэмиум' : '👤 Зочин'}
-                  </div>
-                  <div className="text-gray-600">Дансны төрөл</div>
-                </div>
-              </div>
-
-              {/* Subscription Card */}
-              {subscriptionLoading ? (
-                <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg border border-amber-300 p-6 mb-8">
-                  <p className="text-amber-700">Гишүүнчлэлийн статусыг ачааллаж байна...</p>
-                </div>
-              ) : subscription ? (
-                <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg border border-amber-300 p-6 mb-8">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-2xl font-bold text-amber-900 mb-1">Гишүүнчлэлийн статус</h3>
-                      <p className="text-amber-700">
-                        {subscription.accountType === 'premium' ? '⭐ Пүрэмиум гишүүн' : '👤 Зочны данс'}
-                      </p>
-                    </div>
-                    <span className={`px-4 py-2 rounded-full text-sm font-semibold ${
-                      subscription.accountType === 'premium' 
-                        ? 'bg-amber-800 text-white' 
-                        : 'bg-gray-400 text-white'
-                    }`}>
-                      {subscription.accountType === 'premium' ? 'ИДЭВХТЭЙ' : 'ЗОЧИН'}
-                    </span>
-                  </div>
-
-                  {subscription.accountType === 'premium' && (
-                    <div className="mb-4 text-sm text-amber-700">
-                      <strong>Сунгалтын огноо:</strong> {new Date(subscription.subscriptionExpiry).toLocaleDateString()}
-                    </div>
-                  )}
-
-                  {/* Benefits List */}
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-amber-900 mb-3">Таны давуу тал:</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      <div className="flex items-center text-amber-800">
-                        <span className="text-green-600 mr-2">✓</span>
-                        {subscription.accountType === 'premium' ? 'Эрт захиалах эрх' : 'Стандарт захиалга'}
-                      </div>
-                      <div className="flex items-center text-amber-800">
-                        <span className="text-green-600 mr-2">✓</span>
-                        {subscription.accountType === 'premium' ? 'Бүх захиалгад 20% хямдрал' : 'Стандарт үнэ'}
-                      </div>
-                      <div className="flex items-center text-amber-800">
-                        <span className="text-green-600 mr-2">✓</span>
-                        {subscription.accountType === 'premium' ? 'Үнэгүй өрөө дэвшүүлэх' : 'Дэвшүүлэх боломжгүй'}
-                      </div>
-                      <div className="flex items-center text-amber-800">
-                        <span className="text-green-600 mr-2">✓</span>
-                        {subscription.accountType === 'premium' ? '24/7 Тэргүүн тусламж' : 'Стандарт тусламж'}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex gap-4">
-                    {subscription.accountType === 'guest' ? (
-                      <button
-                        onClick={handleUpgrade}
-                        className="bg-amber-800 text-white px-6 py-2 rounded-lg hover:bg-amber-900 transition font-semibold"
-                      >
-                        🚀 Премиүм болгох
-                      </button>
-                    ) : (
-                      <button
-                        onClick={handleDowngrade}
-                        className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition font-semibold"
-                      >
-                        📉 Зочин рүү буулгах
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ) : (
-                <div className="bg-gradient-to-r from-amber-50 to-amber-100 rounded-lg border border-amber-300 p-6 mb-8">
-                  <p className="text-amber-700">Гишүүнчлэлийн статусыг ачааллах боломжгүй</p>
-                </div>
-              )}
-
-              <div className="border-t pt-6">
-                <h2 className="text-xl font-semibold mb-4">Дансны дэлгэрэнгүй</h2>
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Гишүүн болсон огноо:</span>
-                    <span className="font-semibold">
-                      {new Date(profile?.memberSince).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Дансны статус:</span>
-                    <span className="font-semibold text-green-600">Идэвхтэй</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <h2 className="text-2xl font-bold mb-6">Профайл засах</h2>
-
-              {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-                  {error}
-                </div>
-              )}
-
+            <div className="pt-12 flex items-start justify-between gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Бүтэн нэр</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">И-мэйл хаяг</label>
-                <input
-                  type="email"
-                  value={profile?.email}
-                  disabled
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed"
-                />
-                <p className="text-xs text-gray-500 mt-1">И-мэйл хаягийг өөрчлөх боломжгүй</p>
-              </div>
-
-              <div className="border-t pt-6">
-                <h3 className="text-lg font-semibold mb-4">Нууц үг солих (Заавал биш)</h3>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Одоогийн нууц үг</label>
-                    <input
-                      type="password"
-                      name="currentPassword"
-                      value={formData.currentPassword}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                      placeholder="Одоогийн нууц үгийг оруулна уу"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Шинэ нууц үг</label>
-                    <input
-                      type="password"
-                      name="newPassword"
-                      value={formData.newPassword}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                      placeholder="Шинэ нууц үгийг оруулна уу (доод тал нь 6 тэмдэгт)"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Шинэ нууц үгийг баталгаажуулах</label>
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500"
-                      placeholder="Шинэ нууц үгийг дахин оруулна уу"
-                    />
-                  </div>
+                <h1 className="text-2xl font-bold text-gray-900">{profile.name}</h1>
+                <p className="text-sm text-gray-400 mt-0.5">{profile.email}</p>
+                <div className="flex items-center gap-2 mt-2">
+                  <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${
+                    isPremium ? 'bg-violet-100 text-violet-700 ring-1 ring-violet-200' : 'bg-gray-100 text-gray-500'
+                  }`}>
+                    {isPremium ? 'Premium' : 'Guest'}
+                  </span>
                 </div>
               </div>
-
-              <div className="flex gap-4">
+              {!editing && (
                 <button
-                  type="submit"
-                  className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition font-semibold"
+                  onClick={() => setEditing(true)}
+                  className="text-sm font-medium text-gray-600 border border-gray-200 px-4 py-2 rounded-lg hover:bg-gray-50 transition"
                 >
-                  💾 Өөрчлөлт хадгалах
+                  Засах
                 </button>
-                <button
-                  type="button"
-                  onClick={cancelEdit}
-                  className="bg-gray-400 text-white px-6 py-2 rounded-lg hover:bg-gray-500 transition font-semibold"
-                >
-                  ✖️ Цуцлах
+              )}
+            </div>
+
+            {/* Stats row */}
+            <div className="grid grid-cols-3 gap-3 mt-6">
+              {[
+                { label: 'Нийт захиалга',  value: reservations.length },
+                { label: 'Идэвхтэй',       value: confirmedCount },
+                { label: 'Гишүүн болсон',  value: fmtDate(profile.createdAt) },
+              ].map(({ label, value }) => (
+                <div key={label} className="bg-gray-50 rounded-xl p-4 text-center">
+                  <div className="text-xl font-bold text-gray-900">{value}</div>
+                  <div className="text-xs text-gray-400 mt-0.5">{label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Edit form ── */}
+        {editing && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-5">Профайл засах</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Бүтэн нэр</label>
+                <input type="text" name="name" value={formData.name} onChange={handleInputChange} required
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-300" />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">И-мэйл</label>
+                <input type="email" value={profile.email} disabled
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-400 cursor-not-allowed" />
+              </div>
+              <div className="border-t border-gray-100 pt-4">
+                <p className="text-sm font-medium text-gray-700 mb-3">Нууц үг солих (Заавал биш)</p>
+                <div className="space-y-3">
+                  {[
+                    { name: 'currentPassword', label: 'Одоогийн нууц үг' },
+                    { name: 'newPassword', label: 'Шинэ нууц үг' },
+                    { name: 'confirmPassword', label: 'Шинэ нууц үг давтах' },
+                  ].map(({ name, label }) => (
+                    <div key={name}>
+                      <label className="block text-xs text-gray-500 mb-1">{label}</label>
+                      <input type="password" name={name} value={formData[name]} onChange={handleInputChange}
+                        className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-300" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="flex gap-2 pt-1">
+                <button type="submit" className="bg-amber-800 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-amber-900 transition">
+                  Хадгалах
+                </button>
+                <button type="button" onClick={() => { setEditing(false); setError(''); }}
+                  className="text-sm text-gray-500 px-4 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
+                  Цуцлах
                 </button>
               </div>
             </form>
+          </div>
+        )}
+
+        {/* ── Subscription card ── */}
+        <div className={`rounded-2xl border p-6 ${
+          isPremium
+            ? 'bg-gradient-to-br from-violet-50 to-purple-50 border-violet-200'
+            : 'bg-white border-gray-100 shadow-sm'
+        }`}>
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Гишүүнчлэл</h2>
+              <p className="text-sm text-gray-500 mt-0.5">
+                {isPremium ? 'Premium гишүүн' : 'Зочны данс'}
+              </p>
+            </div>
+            <span className={`text-xs font-bold px-3 py-1 rounded-full ${
+              isPremium ? 'bg-violet-700 text-white' : 'bg-gray-200 text-gray-600'
+            }`}>
+              {isPremium ? 'PREMIUM' : 'GUEST'}
+            </span>
+          </div>
+
+          {isPremium && subscription?.subscriptionExpiry && (
+            <p className="text-xs text-violet-600 mb-4">
+              Сунгалтын огноо: {fmtDate(subscription.subscriptionExpiry)}
+            </p>
+          )}
+
+          <div className="grid grid-cols-2 gap-2 mb-5 text-sm">
+            {[
+              isPremium ? 'Эрт захиалах эрх' : 'Стандарт захиалга',
+              isPremium ? 'Бүх захиалгад 20% хямдрал' : 'Стандарт үнэ',
+              isPremium ? 'Үнэгүй өрөө дэвшүүлэх' : 'Дэвшүүлэх боломжгүй',
+              isPremium ? '24/7 Тэргүүн тусламж' : 'Стандарт тусламж',
+            ].map(benefit => (
+              <div key={benefit} className="flex items-center gap-1.5 text-gray-600">
+                <svg className={`w-3.5 h-3.5 flex-shrink-0 ${isPremium ? 'text-violet-600' : 'text-gray-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                {benefit}
+              </div>
+            ))}
+          </div>
+
+          {isPremium ? (
+            <button onClick={handleDowngrade}
+              className="text-sm text-red-500 border border-red-200 px-4 py-2 rounded-lg hover:bg-red-50 transition">
+              Зочин рүү буулгах
+            </button>
+          ) : (
+            <button onClick={handleUpgrade}
+              className="text-sm font-semibold bg-violet-700 text-white px-5 py-2 rounded-lg hover:bg-violet-800 transition shadow-sm">
+              Premium болгох
+            </button>
           )}
         </div>
-      </div>
 
-      {/* Spacing between profile and reservations */}
-      <div className="my-4"></div>
+        {/* ── Reservations ── */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-5">Миний захиалгууд</h2>
 
-      {/* Reservations Section */}
-      <div className="bg-white rounded-lg shadow-lg p-6 mt-8">
-        <h2 className="text-2xl font-bold mb-6">Миний захиалгууд</h2>
-
-        {reservations.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <div className="text-6xl mb-4">🏨</div>
-            <p className="text-xl mb-2">Захиалга байхгүй байна</p>
-            <p className="text-sm mb-6">Төгс хонолтоо төлөвлөж эхлэх</p>
-            <button
-              onClick={() => navigate('/')}
-              className="bg-amber-800 text-white px-6 py-3 rounded-lg hover:bg-amber-900 transition font-semibold"
-            >
-              Манай ресортыг судлах
-            </button>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {reservations.map((reservation) => (
-              <div
-                key={reservation._id}
-                className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition"
-              >
-                <div className="flex">
-                  {/* Image */}
-                  <div className="w-1/3">
-                    <img
-                      src={
-                        reservation.itemDetails?.image
-                          ? `${BASE_URL}${reservation.itemDetails.image}`
-                          : 'https://via.placeholder.com/200x150?text=Room'
-                      }
-                      alt={reservation.itemDetails?.title || 'Room'}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-
-                  {/* Details */}
-                  <div className="w-2/3 p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-bold text-lg text-gray-900">
-                        {reservation.itemDetails?.title || 'Room'}
-                      </h3>
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadge(reservation.status)}`}>
-                        {reservation.status.charAt(0).toUpperCase() + reservation.status.slice(1)}
-                      </span>
+          {reservations.length === 0 ? (
+            <div className="text-center py-14">
+              <p className="text-gray-400 text-sm mb-4">Одоогоор захиалга байхгүй байна</p>
+              <button onClick={() => navigate('/')}
+                className="text-sm font-semibold text-amber-800 border border-amber-200 px-5 py-2.5 rounded-xl hover:bg-amber-50 transition">
+                Ресортыг үзэх
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {reservations.map(r => {
+                const imgSrc = r.itemDetails?.image
+                  ? getImageUrl(r.itemDetails.image)
+                  : null;
+                return (
+                  <div key={r._id} className="flex gap-4 border border-gray-100 rounded-xl p-4 hover:bg-gray-50 transition">
+                    {/* Thumbnail */}
+                    <div className="w-24 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100">
+                      {imgSrc ? (
+                        <img src={imgSrc} alt={r.itemDetails?.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <svg className="w-6 h-6 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
+                          </svg>
+                        </div>
+                      )}
                     </div>
 
-                    <p className="text-gray-600 text-sm mb-2">
-                      {reservation.itemDetails?.price || 'Тодорхойгүй'} шөнөд
-                    </p>
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <h3 className="font-semibold text-gray-900 text-sm truncate">
+                            {r.itemDetails?.title || 'Захиалга'}
+                          </h3>
+                          <p className="text-xs text-gray-400 mt-0.5 capitalize">{r.itemDetails?.category || '—'}</p>
+                        </div>
+                        <span className={`text-xs font-medium px-2.5 py-0.5 rounded-full flex-shrink-0 ${statusStyle(r.status)}`}>
+                          {statusLabel(r.status)}
+                        </span>
+                      </div>
 
-                    <p className="text-gray-500 text-xs mb-4">
-                      Захиалсан огноо: {new Date(reservation.createdAt).toLocaleDateString()}
-                    </p>
+                      <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                        <span className="font-semibold text-amber-800">{r.itemDetails?.price || '—'}</span>
+                        {r.checkIn && <span>Орох: {fmtDate(r.checkIn)}</span>}
+                        {r.checkOut && <span>Гарах: {fmtDate(r.checkOut)}</span>}
+                        <span>{r.guests || 1} зочин</span>
+                      </div>
 
-                    <div className="flex gap-2">
-                      {reservation.item && (
-                        <button
-                          onClick={() => handleViewRoom(reservation.item._id)}
-                          className="flex-1 bg-amber-800 text-white px-3 py-2 rounded text-sm hover:bg-amber-900 transition"
-                        >
-                          Өрөө үзэх
+                      {/* Payment info */}
+                      {r.payment?.status === 'paid' && (
+                        <div className="mt-2 flex items-center gap-1.5 text-xs text-emerald-600">
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                          Төлбөр төлөгдсөн · {r.payment.method === 'card' ? 'Карт' : r.payment.method}
+                          {r.payment.amount && ` · ${r.payment.amount}`}
+                        </div>
+                      )}
+
+                      <p className="text-xs text-gray-400 mt-1">
+                        Захиалсан: {fmtDate(r.createdAt)}
+                      </p>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex flex-col gap-1.5 flex-shrink-0 justify-center">
+                      {r.item && (
+                        <button onClick={() => navigate(`/destination/${r.item._id || r.item}`)}
+                          className="text-xs text-amber-800 border border-amber-200 px-3 py-1.5 rounded-lg hover:bg-amber-50 transition font-medium">
+                          Үзэх
                         </button>
                       )}
-                      {reservation.status !== 'cancelled' && (
-                        <button
-                          onClick={() => handleCancelReservation(reservation._id)}
-                          className="flex-1 bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700 transition"
-                        >
+                      {r.status !== 'cancelled' && (
+                        <button onClick={() => handleCancelReservation(r._id)}
+                          className="text-xs text-red-500 border border-red-100 px-3 py-1.5 rounded-lg hover:bg-red-50 transition font-medium">
                           Цуцлах
                         </button>
                       )}
                     </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+                );
+              })}
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   );

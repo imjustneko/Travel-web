@@ -53,12 +53,25 @@ const reservationSchema = new mongoose.Schema({
     default: ''
   },
   
+  // Payment
+  payment: {
+    status: {
+      type: String,
+      enum: ['pending', 'paid', 'failed'],
+      default: 'pending',
+    },
+    method: { type: String, default: null },
+    amount: { type: String, default: null },
+    cardLast4: { type: String, default: null },
+    paidAt: { type: Date, default: null },
+  },
+
   // Timestamps
   createdAt: {
     type: Date,
     default: Date.now
   },
-  
+
   updatedAt: {
     type: Date,
     default: Date.now
