@@ -99,15 +99,14 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Navbar
+        isAuthenticated={isAuthenticated}
+        isAdmin={isAdmin}
+      />
       <TopBar
         isAuthenticated={isAuthenticated}
         isAdmin={isAdmin}
         userName={userName}
-        onLogout={handleLogout}
-      />
-      <Navbar
-        isAuthenticated={isAuthenticated}
-        isAdmin={isAdmin}
         onLogout={handleLogout}
       />
 
