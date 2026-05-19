@@ -1,5 +1,5 @@
 // frontend/src/App.jsx
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useState, useEffect, lazy, Suspense } from 'react';
 import api from './api';
 import TopBar from './components/TopBar';
@@ -74,6 +74,9 @@ function App() {
     setSearchParams(params);
   };
 
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin');
+
   // Protected Route Component
   const ProtectedRoute = ({ children }) => {
     return isAuthenticated ? children : <Navigate to="/login" />;
@@ -84,21 +87,36 @@ function App() {
     return isAuthenticated && isAdmin ? children : <Navigate to="/" />;
   };
 
+  if (isAdminPage) {
+    return (
+      <Routes>
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminDashboard onLogout={handleLogout} userName={userName} />
+            </AdminRoute>
+          }
+        />
+      </Routes>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <TopBar 
-        isAuthenticated={isAuthenticated} 
+      <TopBar
+        isAuthenticated={isAuthenticated}
         isAdmin={isAdmin}
         userName={userName}
         onLogout={handleLogout}
         onSearch={handleSearch}
       />
-      <Navbar 
-        isAuthenticated={isAuthenticated} 
+      <Navbar
+        isAuthenticated={isAuthenticated}
         isAdmin={isAdmin}
-        onLogout={handleLogout} 
+        onLogout={handleLogout}
       />
-      
+
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home searchParams={searchParams} />} />
@@ -106,21 +124,13 @@ function App() {
           <Route path="/register" element={<Register onLogin={handleLogin} />} />
           <Route path="/destination/:id" element={<DestinationDetail />} />
           <Route path="/events" element={<EventsList />} />
-          <Route 
-            path="/profile" 
+          <Route
+            path="/profile"
             element={
               <ProtectedRoute>
                 <Profile userName={userName} setUserName={setUserName} />
               </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/admin" 
-            element={
-              <AdminRoute>
-                <AdminDashboard />
-              </AdminRoute>
-            } 
+            }
           />
         </Routes>
       </main>
