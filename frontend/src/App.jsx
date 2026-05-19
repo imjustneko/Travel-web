@@ -18,7 +18,6 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [userName, setUserName] = useState('');
-  const [searchParams, setSearchParams] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -70,10 +69,6 @@ function App() {
     setUserName('');
   };
 
-  const handleSearch = (params) => {
-    setSearchParams(params);
-  };
-
   const location = useLocation();
   const isAdminPage = location.pathname.startsWith('/admin');
 
@@ -109,7 +104,6 @@ function App() {
         isAdmin={isAdmin}
         userName={userName}
         onLogout={handleLogout}
-        onSearch={handleSearch}
       />
       <Navbar
         isAuthenticated={isAuthenticated}
@@ -119,7 +113,7 @@ function App() {
 
       <main className="flex-1">
         <Routes>
-          <Route path="/" element={<Home searchParams={searchParams} />} />
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/register" element={<Register onLogin={handleLogin} />} />
           <Route path="/destination/:id" element={<DestinationDetail />} />
