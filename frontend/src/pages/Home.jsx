@@ -207,8 +207,25 @@ function Home() {
   const sectionClass = 'scroll-mt-20';
   const compareRooms = rooms.filter(r => compareIds.includes(r._id));
 
+  const resortLD = {
+    '@context': 'https://schema.org',
+    '@type': 'LodgingBusiness',
+    name: 'Улаан Хад Ресорт',
+    description: 'Горхи-Тэрэлж Үндэсний Цэцэрлэгт Хүрээлэнгийн 5 оддын тансаг ресорт',
+    url: 'https://travel-web-mu-one.vercel.app',
+    telephone: '+97611123456',
+    starRating: { '@type': 'Rating', ratingValue: '5' },
+    address: { '@type': 'PostalAddress', addressLocality: 'Горхи-Тэрэлж', addressCountry: 'MN' },
+  };
+
   return (
     <div className="bg-gray-50">
+      <SEO
+        title="Горхи-Тэрэлжийн 5 оддын тансаг амралт"
+        description="Монголын байгалийн зүрхэнд тансаг өрөө, гурмэ хоол, адал явдалт үйл ажиллагаа. Улаан Хад Ресорт — Горхи-Тэрэлж."
+        path="/"
+        structuredData={resortLD}
+      />
 
       {/* Compare Modal */}
       {showCompare && compareRooms.length >= 2 && (

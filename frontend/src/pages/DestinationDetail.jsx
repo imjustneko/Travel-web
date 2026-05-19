@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import api, { getImageUrl } from '../api';
 import ReviewSection from '../components/ReviewSection';
 import { useFavorites } from '../hooks/useFavorites';
+import SEO from '../components/SEO';
 
 // ── Availability Calendar ──────────────────────────────────────
 const MONTH_NAMES = ['1-р сар','2-р сар','3-р сар','4-р сар','5-р сар','6-р сар',
@@ -496,8 +497,31 @@ function DestinationDetail() {
     ? (getImageUrl(item.images[currentImageIndex]) || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800')
     : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';
 
+  const itemLD = item ? {
+    '@context': 'https://schema.org',
+    '@type': item.category === 'room' ? 'HotelRoom' : 'Product',
+    name: item.title,
+    description: item.description,
+    image: item.images?.[0] ? getImageUrl(item.images[0]) : undefined,
+    offers: item.price ? {
+      '@type': 'Offer',
+      price: item.priceValue || item.price,
+      priceCurrency: 'MNT',
+      availability: 'https://schema.org/InStock',
+    } : undefined,
+  } : null;
+
   return (
     <div className="min-h-screen bg-gray-50">
+      {item && (
+        <SEO
+          title={item.title}
+          description={item.description?.slice(0, 160)}
+          image={item.images?.[0] ? getImageUrl(item.images[0]) : undefined}
+          path={`/destination/${item._id}`}
+          structuredData={itemLD}
+        />
+      )}
 
       {showModal && (
         <PaymentModal item={item} onClose={() => setShowModal(false)} onSuccess={handlePaymentSuccess} />

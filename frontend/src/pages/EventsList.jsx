@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api, { getImageUrl } from '../api';
+import SEO from '../components/SEO';
 
 function EventsList() {
   const [events, setEvents] = useState([]);
@@ -44,6 +45,11 @@ function EventsList() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <SEO
+        title="Ресортын арга хэмжээ"
+        description="Улаан Хад Ресортод болох арга хэмжээ, баяр ёслол, тусгай тохиолдлуудад бидэнтэй нэгдэнэ үү."
+        path="/events"
+      />
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-amber-800 to-amber-900 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">

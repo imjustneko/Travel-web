@@ -203,6 +203,141 @@ router.delete('/reservations/:id', adminAuth, async (req, res) => {
   }
 });
 
+// Revenue analytics
+router.get('/revenue', adminAuth, async (req, res) => {
+  try {
+    const paid = await Reservation.find({ 'payment.status': 'paid' })
+      .populate('item', 'title category')
+      .sort({ createdAt: -1 });
+
+    let totalRevenue = 0;
+    const monthlyMap = {};
+    const itemMap = {};
+
+    paid.forEach(r => {
+      const amount = parseFloat((r.payment?.amount || '').replace(/[^\d.]/g, '')) || 0;
+      totalRevenue += amount;
+
+      const month = new Date(r.createdAt).toISOString().slice(0, 7);
+      monthlyMap[month] = (monthlyMap[month] || 0) + amount;
+
+      const key = r.itemDetails?.title || r.item?.title || 'Бусад';
+      if (!itemMap[key]) itemMap[key] = { count: 0, revenue: 0 };
+      itemMap[key].count += 1;
+      itemMap[key].revenue += amount;
+    });
+
+    // Last 12 months (fill gaps)
+    const monthly = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(1);
+      d.setMonth(d.getMonth() - i);
+      const key = d.toISOString().slice(0, 7);
+      monthly.push({ month: key, revenue: Math.round(monthlyMap[key] || 0) });
+    }
+
+    const topItems = Object.entries(itemMap)
+      .map(([title, d]) => ({ title, ...d, revenue: Math.round(d.revenue) }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6);
+
+    const thisMonth = monthly[monthly.length - 1]?.revenue || 0;
+    const lastMonth = monthly[monthly.length - 2]?.revenue || 0;
+
+    res.json({ totalRevenue: Math.round(totalRevenue), thisMonth, lastMonth, monthly, topItems, paidCount: paid.length });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch revenue', error: error.message });
+  }
+});
+
+// Occupancy rate
+router.get('/occupancy', adminAuth, async (req, res) => {
+  try {
+    const roomCount = await Destination.countDocuments({ category: 'room' });
+
+    const reservations = await Reservation.find({
+      status: { $ne: 'cancelled' },
+      checkIn: { $ne: null },
+      checkOut: { $ne: null },
+    }).select('checkIn checkOut');
+
+    const nightsPerMonth = {};
+    reservations.forEach(r => {
+      const ci = new Date(r.checkIn);
+      const co = new Date(r.checkOut);
+      const nights = Math.max(0, Math.floor((co - ci) / 86400000));
+      for (let i = 0; i < nights; i++) {
+        const d = new Date(ci);
+        d.setDate(d.getDate() + i);
+        const key = d.toISOString().slice(0, 7);
+        nightsPerMonth[key] = (nightsPerMonth[key] || 0) + 1;
+      }
+    });
+
+    const occupancy = [];
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(1);
+      d.setMonth(d.getMonth() - i);
+      const key = d.toISOString().slice(0, 7);
+      const [yr, mo] = key.split('-').map(Number);
+      const daysInMonth = new Date(yr, mo, 0).getDate();
+      const totalNights = Math.max(1, roomCount * daysInMonth);
+      const bookedNights = nightsPerMonth[key] || 0;
+      occupancy.push({
+        month: key,
+        rate: Math.min(100, Math.round((bookedNights / totalNights) * 100)),
+        bookedNights,
+        totalNights,
+      });
+    }
+
+    const busiest = [...occupancy].sort((a, b) => b.rate - a.rate)[0];
+    res.json({ roomCount, occupancy, busiest });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch occupancy', error: error.message });
+  }
+});
+
+// Export reservations as CSV
+router.get('/reservations/export', adminAuth, async (req, res) => {
+  try {
+    const reservations = await Reservation.find()
+      .populate('user', 'name email')
+      .populate('item', 'title price category')
+      .sort({ createdAt: -1 });
+
+    const headers = ['ID', 'Хэрэглэгч', 'Имэйл', 'Захиалга', 'Ангилал', 'Төлбөрийн дүн', 'Зочид', 'Орох огноо', 'Гарах огноо', 'Төлбөрийн төлөв', 'Захиалгын төлөв', 'Захиалсан огноо'];
+
+    const fmt = d => d ? new Date(d).toLocaleDateString('mn-MN') : '';
+    const esc = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+
+    const rows = reservations.map(r => [
+      r._id,
+      r.user?.name || '',
+      r.user?.email || '',
+      r.itemDetails?.title || r.item?.title || '',
+      r.itemDetails?.category || r.item?.category || '',
+      r.payment?.amount || r.itemDetails?.price || '',
+      r.guests || 1,
+      fmt(r.checkIn),
+      fmt(r.checkOut),
+      r.payment?.status || 'pending',
+      r.status,
+      fmt(r.createdAt),
+    ].map(esc).join(','));
+
+    const csv = '﻿' + [headers.map(esc).join(','), ...rows].join('\n');
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="reservations-${Date.now()}.csv"`);
+    res.send(csv);
+  } catch (error) {
+    res.status(500).json({ message: 'Export failed', error: error.message });
+  }
+});
+
 // Dashboard stats
 router.get('/stats', adminAuth, async (req, res) => {
   try {
