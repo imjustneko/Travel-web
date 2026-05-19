@@ -96,13 +96,13 @@ function Home({ searchParams }) {
         <div className="relative z-10 text-center text-white px-4 max-w-5xl">
           <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/25 rounded-full px-5 py-2 mb-6 text-sm font-medium">
             <span>⭐⭐⭐⭐⭐</span>
-            <span>Горхи-Тэрэлжийн 5 оддын ресорт</span>
+            <span>Горхи-Тэрэлжийн 5 одтой ресорт</span>
           </div>
           <h1 className="text-5xl md:text-7xl font-bold mb-5 leading-tight drop-shadow-xl">
-            Улаан Хад Ресорт
+            улаан хад ресорт
           </h1>
           <p className="text-xl md:text-2xl mb-10 font-light drop-shadow-lg text-white/90 max-w-2xl mx-auto">
-            Байгалийн тэвэрт тансаг амралт — Монгол орны хамгийн гайхалтай газар
+            Байгалийн цэвэр агаарт — Монгол орны хамгийн гайхалтай газар
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
@@ -414,7 +414,7 @@ function Home({ searchParams }) {
           <span className="inline-block text-amber-400 font-semibold text-sm uppercase tracking-wider mb-4 bg-amber-900/50 px-4 py-1 rounded-full border border-amber-700">
             Холбоо барих
           </span>
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-5">Хонолтоо төлөвлөх</h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-5">амралтаа төлөвлөх</h2>
           <div className="w-16 h-1 bg-amber-600 mx-auto mb-6 rounded-full" />
           <p className="text-lg text-gray-300 mb-12 max-w-2xl mx-auto">
             Байгальд тансаг амралт эдлэхэд бэлэн үү? Өнөөдөр бидэнтэй холбоо барина уу.

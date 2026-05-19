@@ -4,6 +4,8 @@ const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('cloudinary').v2;
 const Destination = require('../models/Destination');
+const Reservation = require('../models/Reservation');
+const User = require('../models/User');
 const adminAuth = require('../middleware/admin');
 
 const router = express.Router();
@@ -135,6 +137,90 @@ router.get('/destinations', adminAuth, async (req, res) => {
     res.json(destinations);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch destinations', error: error.message });
+  }
+});
+
+// Get all users
+router.get('/users', adminAuth, async (req, res) => {
+  try {
+    const users = await User.find().select('-password').sort({ createdAt: -1 });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch users', error: error.message });
+  }
+});
+
+// Delete user
+router.delete('/users/:id', adminAuth, async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    await Reservation.deleteMany({ user: req.params.id });
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete user', error: error.message });
+  }
+});
+
+// Get all reservations
+router.get('/reservations', adminAuth, async (req, res) => {
+  try {
+    const reservations = await Reservation.find()
+      .populate('user', 'name email accountType')
+      .populate('item', 'title price category images')
+      .sort({ createdAt: -1 });
+    res.json(reservations);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch reservations', error: error.message });
+  }
+});
+
+// Update reservation status
+router.put('/reservations/:id/status', adminAuth, async (req, res) => {
+  try {
+    const { status } = req.body;
+    const reservation = await Reservation.findByIdAndUpdate(
+      req.params.id,
+      { status, updatedAt: Date.now() },
+      { new: true }
+    ).populate('user', 'name email').populate('item', 'title price');
+    if (!reservation) return res.status(404).json({ message: 'Reservation not found' });
+    res.json(reservation);
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to update reservation', error: error.message });
+  }
+});
+
+// Delete reservation
+router.delete('/reservations/:id', adminAuth, async (req, res) => {
+  try {
+    const reservation = await Reservation.findByIdAndDelete(req.params.id);
+    if (!reservation) return res.status(404).json({ message: 'Reservation not found' });
+    res.json({ message: 'Reservation deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to delete reservation', error: error.message });
+  }
+});
+
+// Dashboard stats
+router.get('/stats', adminAuth, async (req, res) => {
+  try {
+    const [totalDestinations, totalUsers, totalReservations, confirmedReservations, cancelledReservations] = await Promise.all([
+      Destination.countDocuments(),
+      User.countDocuments(),
+      Reservation.countDocuments(),
+      Reservation.countDocuments({ status: 'confirmed' }),
+      Reservation.countDocuments({ status: 'cancelled' }),
+    ]);
+    res.json({
+      totalDestinations,
+      totalUsers,
+      totalReservations,
+      confirmedReservations,
+      cancelledReservations,
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch stats', error: error.message });
   }
 });
 
