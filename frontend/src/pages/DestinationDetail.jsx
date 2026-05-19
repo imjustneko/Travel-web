@@ -27,6 +27,26 @@ function PaymentModal({ item, onClose, onSuccess }) {
     return diff > 0 ? diff : null;
   })();
 
+  // Parse price string → number (e.g. "₮150,000" → 150000, "$599" → 599)
+  const parsedPrice = (() => {
+    const n = parseFloat((item.price || '').replace(/[^\d.]/g, '').replace(/,/g, ''));
+    return isNaN(n) ? null : n;
+  })();
+
+  // Currency prefix/suffix detection
+  const currencyPrefix = /^[₮$€£¥]/.test((item.price || '').trim())
+    ? item.price.trim().charAt(0) : '';
+
+  const formatTotal = (amount) => {
+    if (!amount) return item.price;
+    const formatted = Math.round(amount).toLocaleString();
+    return currencyPrefix ? `${currencyPrefix}${formatted}` : `${formatted}`;
+  };
+
+  const isRoom = item.category === 'room';
+  const totalAmount = isRoom && nights && parsedPrice ? parsedPrice * nights : parsedPrice;
+  const totalStr = formatTotal(totalAmount);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (step === 1) {
@@ -54,7 +74,7 @@ function PaymentModal({ item, onClose, onSuccess }) {
         payment: {
           status: 'paid',
           method: 'card',
-          amount: item.price,
+          amount: totalStr,
           cardLast4: raw.slice(-4),
           paidAt: new Date().toISOString(),
         },
@@ -128,8 +148,11 @@ function PaymentModal({ item, onClose, onSuccess }) {
                 </div>
 
                 {nights && (
-                  <div className="bg-amber-50 border border-amber-100 rounded-lg px-4 py-2.5 text-sm text-amber-800 font-medium">
-                    {nights} шөнө · нийт {item.price}
+                  <div className="bg-amber-50 border border-amber-100 rounded-lg px-4 py-2.5 text-sm text-amber-800">
+                    <div className="flex items-center justify-between">
+                      <span>{nights} шөнө × {item.price}</span>
+                      <span className="font-bold text-base">{totalStr}</span>
+                    </div>
                   </div>
                 )}
 
@@ -220,7 +243,7 @@ function PaymentModal({ item, onClose, onSuccess }) {
                     className={`flex-1 py-3 rounded-xl font-semibold text-sm transition ${
                       submitting ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-amber-800 text-white hover:bg-amber-900'
                     }`}>
-                    {submitting ? 'Боловсруулж байна...' : `${item.price} — Төлбөр төлөх`}
+                    {submitting ? 'Боловсруулж байна...' : `${totalStr} — Төлбөр төлөх`}
                   </button>
                 </div>
               </>
