@@ -27,8 +27,8 @@ export default function Favorites() {
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
         <div className="text-5xl mb-2">🤍</div>
-        <h2 className="text-2xl font-bold text-gray-900">Дуртай зүйлс</h2>
-        <p className="text-gray-500 text-sm">Дуртай зүйлсээ хадгалахын тулд нэвтэрнэ үү</p>
+        <h2 className="text-2xl font-bold text-gray-900">Хадгалах</h2>
+        <p className="text-gray-500 text-sm">Дуртай өрөөгөө хадгалахын тулд нэвтэрнэ үү</p>
         <button onClick={() => navigate('/login')}
           className="mt-2 px-6 py-3 bg-amber-800 text-white rounded-xl font-semibold text-sm hover:bg-amber-900 transition">
           Нэвтрэх
@@ -49,7 +49,7 @@ export default function Favorites() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-gradient-to-r from-amber-800 to-amber-900 text-white py-14">
         <div className="max-w-6xl mx-auto px-4">
-          <h1 className="text-4xl font-bold mb-1">Миний дуртай зүйлс</h1>
+          <h1 className="text-4xl font-bold mb-1">Хадгалсан өрөө</h1>
           <p className="text-white/70 text-sm">
             {favorites.length > 0 ? `${favorites.length} хадгалсан зүйл` : 'Одоогоор хадгалсан зүйл байхгүй'}
           </p>

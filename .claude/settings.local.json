@@ -3,7 +3,8 @@
     "allow": [
       "Bash(netstat -ano)",
       "Bash(findstr \":5000\")",
-      "Bash(npm install *)"
+      "Bash(npm install *)",
+      "Bash(dir \"A:\\\\Projects\\\\Different Project\\\\Tr\\\\Travel-web\\\\frontend\\\\node_modules\\\\react-helmet-async\" /b)"
     ]
   }
 }

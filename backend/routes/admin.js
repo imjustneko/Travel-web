@@ -51,15 +51,14 @@ router.post('/destinations', adminAuth, async (req, res) => {
   try {
     const { title, description, price, priceValue, location, images, rating, duration, featured, discount, originalPrice, category } = req.body;
 
-    // Validate required fields
-    if (!title || !description || !price || !location) {
+    if (!title || !description || !location) {
       return res.status(400).json({ message: 'Please provide all required fields' });
     }
 
     const destination = new Destination({
       title,
       description,
-      price,
+      price: price || 'Үнэгүй',
       location,
       images: images || [],
       rating: rating || 4.5,

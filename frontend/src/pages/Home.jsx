@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api, { getImageUrl } from '../api';
 import GallerySlider from '../components/GallerySlider';
 import { useFavorites } from '../hooks/useFavorites';
+import SEO from '../components/SEO';
 
 const CATEGORIES = [
   { value: 'all',      label: 'Бүгд' },

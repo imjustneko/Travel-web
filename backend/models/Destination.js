@@ -13,7 +13,7 @@ const destinationSchema = new mongoose.Schema({
   },
   price: {
     type: String,
-    required: true
+    default: 'Үнэгүй',
   },
   priceValue: {
     type: Number,
@@ -49,13 +49,15 @@ const destinationSchema = new mongoose.Schema({
     type: String,
     default: null
   },
-  // ⭐ ADD THIS NEW FIELD ⭐
   category: {
     type: String,
     enum: ['room', 'dining', 'activity', 'event', 'offer', 'gallery'],
     default: 'room'
   },
-  // ⭐ END OF NEW FIELD ⭐
+  isFree: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now
