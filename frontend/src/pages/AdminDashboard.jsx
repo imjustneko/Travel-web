@@ -26,7 +26,7 @@ export default function AdminDashboard({ onLogout, userName }) {
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
-    title: '', description: '', price: '', location: '',
+    title: '', description: '', price: '', priceValue: '', location: '',
     duration: '5 days', featured: false, discount: '', originalPrice: '', category: 'room',
   });
   const [imageUrls, setImageUrls] = useState(['']);
@@ -73,6 +73,7 @@ export default function AdminDashboard({ onLogout, userName }) {
   const handleEditDest = (d) => {
     setFormData({
       title: d.title, description: d.description, price: d.price,
+      priceValue: d.priceValue != null ? String(d.priceValue) : '',
       location: d.location, duration: d.duration, featured: d.featured,
       discount: d.discount || '', originalPrice: d.originalPrice || '',
       category: d.category || 'room',
@@ -91,7 +92,7 @@ export default function AdminDashboard({ onLogout, userName }) {
 
   const resetForm = () => {
     setFormData({
-      title: '', description: '', price: '', location: '',
+      title: '', description: '', price: '', priceValue: '', location: '',
       duration: '5 days', featured: false, discount: '', originalPrice: '', category: 'room',
     });
     setImageUrls(['']);
@@ -299,14 +300,38 @@ export default function AdminDashboard({ onLogout, userName }) {
                         <textarea name="description" value={formData.description} onChange={handleInput} placeholder="Тайлбар" rows="3" required
                           className="border border-gray-200 px-3 py-2 rounded-lg text-sm w-full focus:outline-none focus:ring-2 focus:ring-gray-300 resize-none" />
                         <div className="grid grid-cols-4 gap-3">
-                          <input name="price" value={formData.price} onChange={handleInput} placeholder="Үнэ"
-                            className="border border-gray-200 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+                          <div>
+                            <input name="price" value={formData.price} onChange={handleInput} placeholder="Үнэ (жнэ: ₮100,000)"
+                              className="border border-gray-200 px-3 py-2 rounded-lg text-sm w-full focus:outline-none focus:ring-2 focus:ring-gray-300" />
+                            <p className="text-xs text-gray-400 mt-0.5 px-1">Харуулах үнэ</p>
+                          </div>
+                          <div>
+                            <input name="priceValue" type="number" min="0" value={formData.priceValue} onChange={handleInput}
+                              placeholder="100000"
+                              className={`border px-3 py-2 rounded-lg text-sm w-full focus:outline-none focus:ring-2 ${
+                                formData.category === 'room' ? 'border-amber-300 focus:ring-amber-300 bg-amber-50' : 'border-gray-200 focus:ring-gray-300'
+                              }`} />
+                            <p className="text-xs mt-0.5 px-1 text-amber-600 font-medium">
+                              {formData.category === 'room' ? '★ Шөнийн үнэ (тоо)' : 'Үнэ (тоо)'}
+                            </p>
+                          </div>
                           <input name="originalPrice" value={formData.originalPrice} onChange={handleInput} placeholder="Анхны үнэ"
                             className="border border-gray-200 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
                           <input name="discount" value={formData.discount} onChange={handleInput} placeholder="Хөнгөлөлт"
                             className="border border-gray-200 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
                           <input name="duration" value={formData.duration} onChange={handleInput} placeholder="Хугацаа"
                             className="border border-gray-200 px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" />
+                          {formData.category === 'room' && formData.priceValue && (
+                            <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 text-xs text-amber-800">
+                              <span>1 шөнө = ₮{Number(formData.priceValue).toLocaleString()}</span>
+                              <span className="text-amber-400">·</span>
+                              <span>3 шөнө = ₮{(Number(formData.priceValue) * 3).toLocaleString()}</span>
+                              <span className="text-amber-400">·</span>
+                              <span>7 шөнө = ₮{(Number(formData.priceValue) * 7).toLocaleString()}</span>
+                            </div>
+                          )}
                         </div>
                         <div className="flex items-center gap-4">
                           <select name="category" value={formData.category} onChange={handleInput}

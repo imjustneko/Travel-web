@@ -21,31 +21,27 @@ function PaymentModal({ item, onClose, onSuccess }) {
     return d.length > 2 ? d.slice(0, 2) + '/' + d.slice(2) : d;
   };
 
+  // Шөнийн тоо
   const nights = (() => {
-    if (!form.checkIn || !form.checkOut) return null;
-    const diff = (new Date(form.checkOut) - new Date(form.checkIn)) / 86400000;
-    return diff > 0 ? diff : null;
+    if (!form.checkIn || !form.checkOut) return 0;
+    const ms = new Date(form.checkOut) - new Date(form.checkIn);
+    return ms > 0 ? Math.floor(ms / 86400000) : 0;
   })();
 
-  // Parse price string → number (e.g. "₮150,000" → 150000, "$599" → 599)
-  const parsedPrice = (() => {
-    const n = parseFloat((item.price || '').replace(/[^\d.]/g, '').replace(/,/g, ''));
-    return isNaN(n) ? null : n;
+  // Шөнийн үнэ: priceValue (тоо) байвал шууд ашиглана, эс тэгвэл price string-с parse хийнэ
+  const priceNum = (() => {
+    if (item.priceValue && item.priceValue > 0) return item.priceValue;
+    const digits = (item.price || '').replace(/[^\d]/g, '');
+    return digits ? parseInt(digits, 10) : 0;
   })();
 
-  // Currency prefix/suffix detection
-  const currencyPrefix = /^[₮$€£¥]/.test((item.price || '').trim())
-    ? item.price.trim().charAt(0) : '';
+  // Валютын тэмдэг
+  const currency = (item.price || '').match(/[₮$€£¥]/)?.[0] || '₮';
 
-  const formatTotal = (amount) => {
-    if (!amount) return item.price;
-    const formatted = Math.round(amount).toLocaleString();
-    return currencyPrefix ? `${currencyPrefix}${formatted}` : `${formatted}`;
-  };
-
+  // Нийт үнэ
   const isRoom = item.category === 'room';
-  const totalAmount = isRoom && nights && parsedPrice ? parsedPrice * nights : parsedPrice;
-  const totalStr = formatTotal(totalAmount);
+  const totalNum = isRoom && nights > 0 && priceNum > 0 ? priceNum * nights : priceNum;
+  const totalStr = totalNum > 0 ? `${currency}${totalNum.toLocaleString()}` : (item.price || '');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -147,7 +143,7 @@ function PaymentModal({ item, onClose, onSuccess }) {
                   </div>
                 </div>
 
-                {nights && (
+                {nights > 0 && (
                   <div className="bg-amber-50 border border-amber-100 rounded-lg px-4 py-2.5 text-sm text-amber-800">
                     <div className="flex items-center justify-between">
                       <span>{nights} шөнө × {item.price}</span>

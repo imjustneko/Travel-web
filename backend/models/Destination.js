@@ -15,6 +15,10 @@ const destinationSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  priceValue: {
+    type: Number,
+    default: null,
+  },
   location: {
     type: String,
     required: true

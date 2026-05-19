@@ -49,7 +49,7 @@ router.post('/upload', adminAuth, upload.array('images', 5), (req, res) => {
 // Create new destination
 router.post('/destinations', adminAuth, async (req, res) => {
   try {
-    const { title, description, price, location, images, rating, duration, featured, discount, originalPrice, category } = req.body;
+    const { title, description, price, priceValue, location, images, rating, duration, featured, discount, originalPrice, category } = req.body;
 
     // Validate required fields
     if (!title || !description || !price || !location) {
@@ -68,6 +68,7 @@ router.post('/destinations', adminAuth, async (req, res) => {
       discount,
       originalPrice,
       category: category || 'room',
+      priceValue: priceValue ? Number(priceValue) : null,
     });
 
     await destination.save();
