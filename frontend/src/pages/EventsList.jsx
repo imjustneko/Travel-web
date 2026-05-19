@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api, { BASE_URL } from '../api';
+import api, { getImageUrl } from '../api';
 
 function EventsList() {
   const [events, setEvents] = useState([]);
@@ -84,8 +84,8 @@ function EventsList() {
                   <div className="relative h-64 overflow-hidden">
                     <img
                       src={
-                        event.images && event.images[0]
-                          ? `${BASE_URL}${event.images[0]}`
+                        (event.images && event.images[0])
+                          ? (getImageUrl(event.images[0]) || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600')
                           : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600'
                       }
                       alt={event.title}

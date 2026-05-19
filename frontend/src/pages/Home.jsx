@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import api, { BASE_URL } from '../api';
+import api, { getImageUrl } from '../api';
 
 function Home({ searchParams }) {
   const [items, setItems] = useState([]);
@@ -196,7 +196,7 @@ function Home({ searchParams }) {
                 >
                   <div className="relative h-64 overflow-hidden">
                     <img
-                      src={room.images[0] ? `${BASE_URL}${room.images[0]}` : 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=600'}
+                      src={getImageUrl(room.images[0]) || 'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=600'}
                       alt={room.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
@@ -254,7 +254,7 @@ function Home({ searchParams }) {
                   <div className="md:flex">
                     <div className="md:w-1/2 h-64">
                       <img 
-                        src={item.images[0] ? `${BASE_URL}${item.images[0]}` : 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600'}
+                        src={getImageUrl(item.images[0]) || 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600'}
                         alt={item.title}
                         className="w-full h-full object-cover"
                       />
@@ -293,7 +293,7 @@ function Home({ searchParams }) {
                 >
                   <div className="h-48 overflow-hidden">
                     <img 
-                      src={activity.images[0] ? `${BASE_URL}${activity.images[0]}` : 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=600'}
+                      src={getImageUrl(activity.images[0]) || 'https://images.unsplash.com/photo-1551632811-561732d1e306?w=600'}
                       alt={activity.title}
                       className="w-full h-full object-cover"
                     />
@@ -331,7 +331,7 @@ function Home({ searchParams }) {
                 >
                   <div className="h-64 overflow-hidden relative">
                     <img 
-                      src={event.images[0] ? `${BASE_URL}${event.images[0]}` : 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600'}
+                      src={getImageUrl(event.images[0]) || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600'}
                       alt={event.title}
                       className="w-full h-full object-cover"
                     />
@@ -380,7 +380,7 @@ function Home({ searchParams }) {
                   )}
                   <div className="h-64">
                     <img 
-                      src={offer.images[0] ? `${BASE_URL}${offer.images[0]}` : 'https://images.unsplash.com/photo-1596178065887-1198b6148b2b?w=800'}
+                      src={getImageUrl(offer.images[0]) || 'https://images.unsplash.com/photo-1596178065887-1198b6148b2b?w=800'}
                       alt={offer.title}
                       className="w-full h-full object-cover"
                     />

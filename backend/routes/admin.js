@@ -1,42 +1,33 @@
 // backend/routes/admin.js
 const express = require('express');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
 const Destination = require('../models/Destination');
 const adminAuth = require('../middleware/admin');
 
 const router = express.Router();
 
-// Configure multer for image uploads
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = 'uploads/';
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir);
-    }
-    cb(null, uploadDir);
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// Configure multer with Cloudinary storage
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'resort-destinations',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+    transformation: [{ width: 1200, height: 800, crop: 'limit', quality: 'auto' }],
   },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, 'destination-' + uniqueSuffix + path.extname(file.originalname));
-  }
 });
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif|webp/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = allowedTypes.test(file.mimetype);
-    
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed'));
-    }
-  }
+  limits: { fileSize: 5 * 1024 * 1024 },
 });
 
 // Upload images
@@ -46,7 +37,7 @@ router.post('/upload', adminAuth, upload.array('images', 5), (req, res) => {
       return res.status(400).json({ message: 'No files uploaded' });
     }
 
-    const fileUrls = req.files.map(file => `/uploads/${file.filename}`);
+    const fileUrls = req.files.map(file => file.path);
     res.json({ urls: fileUrls });
   } catch (error) {
     res.status(500).json({ message: 'Upload failed', error: error.message });
@@ -116,14 +107,19 @@ router.delete('/destinations/:id', adminAuth, async (req, res) => {
       return res.status(404).json({ message: 'Destination not found' });
     }
 
-    // Delete associated images
+    // Delete associated images from Cloudinary
     if (destination.images && destination.images.length > 0) {
-      destination.images.forEach(imageUrl => {
-        const imagePath = path.join(__dirname, '..', imageUrl);
-        if (fs.existsSync(imagePath)) {
-          fs.unlinkSync(imagePath);
+      for (const imageUrl of destination.images) {
+        try {
+          // Extract public_id from Cloudinary URL
+          const parts = imageUrl.split('/');
+          const filename = parts[parts.length - 1].split('.')[0];
+          const folder = parts[parts.length - 2];
+          await cloudinary.uploader.destroy(`${folder}/${filename}`);
+        } catch (err) {
+          console.error('Failed to delete image from Cloudinary:', err.message);
         }
-      });
+      }
     }
 
     res.json({ message: 'Destination deleted successfully' });

@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api, { BASE_URL } from '../api';
+import api, { getImageUrl } from '../api';
 import ReviewSection from '../components/ReviewSection'; // ⭐ ADDED
 
 function DestinationDetail() {
@@ -149,8 +149,8 @@ function DestinationDetail() {
   }
 
   const hasImages = item.images && item.images.length > 0;
-  const currentImage = hasImages 
-    ? `${BASE_URL}${item.images[currentImageIndex]}`
+  const currentImage = hasImages
+    ? (getImageUrl(item.images[currentImageIndex]) || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800')
     : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';
 
   return (
