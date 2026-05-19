@@ -127,7 +127,7 @@ function Home() {
             Улаан Хад Ресорт
           </h1>
           <p className="text-lg md:text-xl mb-10 font-light text-white/80 max-w-xl mx-auto leading-relaxed">
-            Байгалийн тэвэрт тансаг амралт — Монгол орны хамгийн гайхалтай газар
+            Байгалийн цэвэр тансаг амралт
           </p>
 
           {/* ── Search widget ── */}
@@ -263,7 +263,7 @@ function Home() {
       {/* ── Rooms ── */}
       <section id="rooms" className={`py-20 bg-gray-50 ${sectionClass}`}>
         <div className="max-w-7xl mx-auto px-4">
-          <SectionHeader label="Байрлал" title="Өрөө ба Бүхлийн өрөөнүүд" sub="Таны тав тухыг хангахаар зориулалттай тансаг байр" />
+          <SectionHeader label="Байрлал" title="Бүх өрөө" sub="Таны тав тухыг хангахаар зориулалттай тансаг байр" />
           {rooms.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7">
               {rooms.map(room => (
