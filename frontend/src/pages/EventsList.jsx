@@ -152,7 +152,7 @@ function EventsList() {
       {/* Call to Action */}
       <div className="bg-gray-900 text-white py-16 mt-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Бүү алда</h2>
+          <h2 className="text-3xl font-bold mb-4">Бүү алд</h2>
           <p className="text-xl mb-8 opacity-90">
             Удахгүй болох арга хэмжээ болон тусгай саналуудын талаар мэдэгдэл авахын тулд бидний мэдээллийн захидалд бүртгүүлнэ үү
           </p>
